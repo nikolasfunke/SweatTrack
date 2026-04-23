@@ -57,12 +57,12 @@ function Inicio() {
               
               <button
                 onClick={() => setShowForm(true)}
-                className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold shadow-lg hover:bg-red-800 transition"
+                className="w-full py-3 rounded-full bg-[#830202] text-gray-300 font-semibold shadow-lg hover:bg-red-800 transition"
               >
                 LOGIN
               </button>
 
-              <button className="w-full py-3 rounded-full bg-white/10 text-white font-semibold shadow-lg hover:bg-white/15 transition">
+              <button className="w-full py-3 rounded-full bg-white/10 text-gray-800 font-semibold shadow-lg hover:bg-white/15 transition">
                 CADASTRO
               </button>
             </motion.div>

@@ -66,14 +66,14 @@ function Inicio() {
             >
               <button
                 onClick={() => setFormType("login")}
-                className="w-full py-3 rounded-full bg-gradient-to-r from-red-700 to-red-900 text-white font-semibold shadow-[0_4px_24px_rgba(131,2,2,0.5)] hover:shadow-[0_8px_32px_rgba(131,2,2,0.6)] hover:scale-[1.03] active:scale-[0.97] transition duration-200"
+                className="w-full py-3 rounded-full bg-gradient-to-r from-red-700 to-red-900 text-white font-semibold shadow-[0_4px_24px_rgba(131,2,2,0.5)] cursor-pointer hover:shadow-[0_8px_32px_rgba(131,2,2,0.6)] hover:scale-[1.03] active:scale-[0.97] transition duration-200"
               >
                 LOGIN
               </button>
 
               <button
                 onClick={() => setFormType("cadastro")}
-                className="w-full py-3 rounded-full bg-white/15 backdrop-blur-lg text-white font-medium shadow-md border border-white/20 hover:bg-white/25 hover:scale-[1.02] active:scale-[0.98] transition"
+                className="w-full py-3 rounded-full bg-white/15 backdrop-blur-lg text-white font-medium shadow-md border border-white/20 cursor-pointer hover:bg-white/25 hover:scale-[1.02] active:scale-[0.98] transition"
               >
                 CADASTRO
               </button>
@@ -113,7 +113,7 @@ function Inicio() {
                       className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-sm font-medium transition ${
                         role === "atleta"
                           ? "border-red-500 bg-red-700/90 text-white"
-                          : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
+                          : "border-white/20 bg-white/10 text-white/80 cursor-pointer hover:bg-white/20"
                       }`}
                     >
                       <RunningShoe className="h-6 w-6" />
@@ -125,14 +125,14 @@ function Inicio() {
                       className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-sm font-medium transition ${
                         role === "treinador"
                           ? "border-red-500 bg-red-700/90 text-white"
-                          : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
+                          : "border-white/20 bg-white/10 text-white/80 cursor-pointer hover:bg-white/20"
                       }`}
                     >
                       <Whistle className="h-6 w-6" />
                       Treinador
                     </button>
                   </div>
-                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold hover:bg-red-700 transition">
+                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold cursor-pointer hover:bg-red-700 transition">
                     Cadastrar
                   </button>
                 </>
@@ -147,7 +147,7 @@ function Inicio() {
                     placeholder="Senha"
                     className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
-                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold hover:bg-red-700 transition">
+                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold cursor-pointer hover:bg-red-700 transition">
                     Entrar
                   </button>
                 </>
@@ -156,7 +156,7 @@ function Inicio() {
               <button
                 type="button"
                 onClick={() => setFormType(null)}
-                className="text-sm text-gray-900/90 mt-2"
+                className="text-sm text-gray-900/90 mt-2 cursor-pointer hover:underline hover:text-gray-900 transition"
               >
                 ← Voltar
               </button>

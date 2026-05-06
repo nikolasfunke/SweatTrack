@@ -4,9 +4,13 @@ import logoFull from "../assets/logo_sweatTrack.svg";
 import logoIcon from "../assets/logo.svg";
 import bgVideo from "../assets/bg_video_pre.mp4";
 import bgStatic from "../assets/bg_static.jpeg";
+import RunningShoe from "../components/Running-shoe";
+import Whistle from "../components/Whistle";
 
 function Inicio() {
-  const [showForm, setShowForm] = useState(false);
+  const [formType, setFormType] = useState(null);
+  const [role, setRole] = useState("atleta");
+  const showForm = formType !== null;
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-36 relative overflow-hidden">
@@ -61,43 +65,98 @@ function Inicio() {
               className="flex flex-col gap-4"
             >
               <button
-                onClick={() => setShowForm(true)}
-                className="w-full py-3 rounded-full bg-gradient-to-r from-red-700 to-red-900 text-white font-semibold shadow-[0_4px_24px_rgba(131,2,2,0.5)] hover:shadow-[0_8px_32px_rgba(131,2,2,0.6)] hover:scale-[1.03] active:scale-[0.97] transition duration-200"
+                onClick={() => setFormType("login")}
+                className="w-full py-3 rounded-full bg-gradient-to-r from-red-700 to-red-900 text-white font-semibold shadow-[0_4px_24px_rgba(131,2,2,0.5)] cursor-pointer hover:shadow-[0_8px_32px_rgba(131,2,2,0.6)] hover:scale-[1.03] active:scale-[0.97] transition duration-200"
               >
                 LOGIN
               </button>
 
-              <button className="w-full py-3 rounded-full bg-white/15 backdrop-blur-lg text-white font-medium shadow-md border border-white/20 hover:bg-white/25 hover:scale-[1.02] active:scale-[0.98] transition">
+              <button
+                onClick={() => setFormType("cadastro")}
+                className="w-full py-3 rounded-full bg-white/15 backdrop-blur-lg text-white font-medium shadow-md border border-white/20 cursor-pointer hover:bg-white/25 hover:scale-[1.02] active:scale-[0.98] transition"
+              >
                 CADASTRO
               </button>
             </motion.div>
           ) : (
             <motion.form
-              key="form"
+              key={formType}
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: -60 }}
+              animate={{ opacity: 1, y: -140 }}
               exit={{ opacity: 0, y: -40 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 overflow-hidden"
             >
-              <input
-                placeholder="Email"
-                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
-              <input
-                type="password"
-                placeholder="Senha"
-                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
-              <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold hover:bg-red-700 transition">
-                Entrar
-              </button>
+              {formType === "cadastro" ? ( 
+                <>
+                  <input
+                    placeholder="Nome"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <input
+                    placeholder="Email"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Senha"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirmar senha"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRole("atleta")}
+                      className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-sm font-medium transition ${
+                        role === "atleta"
+                          ? "border-red-500 bg-red-700/90 text-white"
+                          : "border-white/20 bg-white/10 text-white/80 cursor-pointer hover:bg-white/20"
+                      }`}
+                    >
+                      <RunningShoe className="h-6 w-6" />
+                      Atleta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("treinador")}
+                      className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-sm font-medium transition ${
+                        role === "treinador"
+                          ? "border-red-500 bg-red-700/90 text-white"
+                          : "border-white/20 bg-white/10 text-white/80 cursor-pointer hover:bg-white/20"
+                      }`}
+                    >
+                      <Whistle className="h-6 w-6" />
+                      Treinador
+                    </button>
+                  </div>
+                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold cursor-pointer hover:bg-red-700 transition">
+                    Cadastrar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input
+                    placeholder="Email"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Senha"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <button className="w-full py-3 rounded-full bg-[#830202] text-white font-semibold cursor-pointer hover:bg-red-700 transition">
+                    Entrar
+                  </button>
+                </>
+              )}
 
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
-                className="text-sm text-gray-900/90 mt-2"
+                onClick={() => setFormType(null)}
+                className="text-sm text-gray-900/90 mt-2 cursor-pointer hover:underline hover:text-gray-900 transition"
               >
                 ← Voltar
               </button>

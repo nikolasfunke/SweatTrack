@@ -144,7 +144,7 @@ Extrema
 INICIAR SESSAO
 </button>
 <p className="text-center text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-3">
-Protocolo São Camilo V1.0
+Sweat Track
 </p>
 </div>
 

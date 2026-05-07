@@ -3,6 +3,7 @@ import './App.css'
 import Login from './pages/Login'
 import Inicio from './pages/Inicio'
 import PreSessao from './pages/PreSessao'
+import DuranteSessao from './pages/DuranteSessao'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/inicio" element={<Inicio />} />
       <Route path="/PreSessao" element={<PreSessao />} />
+      <Route path="/DuranteSessao" element={<DuranteSessao />} />
     </Routes>
   );
 }

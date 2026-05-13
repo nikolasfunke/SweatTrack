@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Inicio from './pages/Inicio'
 import PreSessao from './pages/PreSessao'
 import DuranteSessao from './pages/DuranteSessao'
+import PosSessao from './pages/PosSessao'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/inicio" element={<Inicio />} />
       <Route path="/PreSessao" element={<PreSessao />} />
       <Route path="/DuranteSessao" element={<DuranteSessao />} />
+      <Route path="/PosSessao" element={<PosSessao />} />
     </Routes>
   );
 }

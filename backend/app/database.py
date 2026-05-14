@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysql+connector://root:password@localhost:3306/sweattrack")
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysqlconnector://root:1110@localhost:3306/sweattrack")
 
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

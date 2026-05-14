@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS hidratacao (
 CREATE TABLE IF NOT EXISTS notificacoes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT NOT NULL,
-  type ENUM('hidratacao','nutricao','recuperacao','alerta') DEFAULT 'hydration',
+  type ENUM('hidratacao','nutricao','recuperacao','alerta') DEFAULT 'hidratacao',
   titulo VARCHAR(200),
   message TEXT,
   lido TINYINT(1) DEFAULT 0,

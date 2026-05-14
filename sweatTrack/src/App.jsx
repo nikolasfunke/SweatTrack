@@ -9,8 +9,8 @@ import PosSessao from './pages/PosSessao'
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/inicio" element={<Inicio />} />
+      <Route path="/" element={<Inicio />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/PreSessao" element={<PreSessao />} />
       <Route path="/DuranteSessao" element={<DuranteSessao />} />
       <Route path="/PosSessao" element={<PosSessao />} />

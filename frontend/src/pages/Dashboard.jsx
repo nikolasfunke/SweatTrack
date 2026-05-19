@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import logoFull from "../assets/logo_sweatTrack.svg";
+import Navbar from "../components/Navbar";
 
 // ── small SVG icons ──────────────────────────────────────────────
 const PlusCircleIcon = () => (
@@ -233,42 +234,8 @@ function Dashboard() {
 
       </div>
 
-      {/* ── Bottom Navigation ── */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 flex justify-around items-center pt-3 pb-5 px-2 rounded-t-[30px] shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-50">
-
-        <button className="flex flex-col items-center gap-1 text-[#DA0027] bg-red-50 px-5 py-2 rounded-2xl -mt-2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <rect x="9" y="13" width="6" height="9" />
-          </svg>
-          <span className="text-[9px] font-bold uppercase">Início</span>
-        </button>
-
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-          </svg>
-          <span className="text-[9px] font-bold uppercase">Monitorar</span>
-        </button>
-
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 20V10" />
-            <path d="M12 20V4" />
-            <path d="M6 20v-4" />
-          </svg>
-          <span className="text-[9px] font-bold uppercase">Análises</span>
-        </button>
-
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <span className="text-[9px] font-bold uppercase">Perfil</span>
-        </button>
-
-      </nav>
+      <Navbar active="inicio" />
+      
 
     </div>
   );

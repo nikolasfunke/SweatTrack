@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import logoIcon from "../assets/logo.svg";
 import logoFull from "../assets/logo_sweatTrack.svg";
+import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 function PreSessao() {
+    const navigate = useNavigate();
 // Estados para controlar os inputs do usuário
 const [peso, setPeso] = useState('00.0');
 const [hidratacao, setHidratacao] = useState(3); // Índice da cor selecionada (0 a 6)
@@ -140,7 +143,10 @@ Extrema
 
 {/* BOTÃO E RODAPÉ */}
 <div className="px-6 mt-8">
-<button className="w-full py-4 rounded-2xl bg-[#DA0027] text-white font-bold text-sm tracking-wide shadow-[0_8px_20px_rgba(218,0,39,0.3)] hover:bg-red-700 active:scale-95 transition-all">
+<button
+onClick={() => navigate("/DuranteSessao")}
+className="w-full py-4 rounded-2xl bg-[#DA0027] text-white font-bold text-sm tracking-wide shadow-[0_8px_20px_rgba(218,0,39,0.3)] hover:bg-red-700 active:scale-95 transition-all"
+>
 INICIAR SESSAO
 </button>
 <p className="text-center text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-3">
@@ -148,29 +154,7 @@ Sweat Track
 </p>
 </div>
 
-{/* BOTTOM NAVIGATION FIXED */}
-<nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 flex justify-around items-center pt-3 pb-5 px-2 rounded-t-[30px] shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-50">
-<button className="flex flex-col items-center gap-1 text-gray-400">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-<span className="text-[9px] font-bold">Início</span>
-</button>
-
-{/* Item Ativo (Monitorar) */}
-<button className="flex flex-col items-center gap-1 text-[#DA0027] bg-red-50 px-5 py-2 rounded-2xl -mt-2">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-<span className="text-[9px] font-bold">Monitorar</span>
-</button>
-
-<button className="flex flex-col items-center gap-1 text-gray-400">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-4"></path></svg>
-<span className="text-[9px] font-bold uppercase">Análises</span>
-</button>
-
-<button className="flex flex-col items-center gap-1 text-gray-400">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-<span className="text-[9px] font-bold uppercase">Perfil</span>
-</button>
-</nav>
+<Navbar active="monitorar" />
 
 </div>
 );

@@ -3,6 +3,7 @@ import logoIcon from "../assets/logo.svg";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 function PreSessao() {
     const navigate = useNavigate();
@@ -25,19 +26,7 @@ const urineColors = [
 return (
 // Container principal simulando a tela do celular com fundo off-white
 <div className="min-h-screen bg-[#F8F9FA] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
-{/* CABEÇALHO */}
-<header className="flex justify-between items-center p-6 bg-white shadow-sm">
-<div className="flex items-center gap-2">
-{/* Ícone de Cruz + Texto São Camilo */}
-<div className="text-[#DA0027] font-black text-lg flex items-center gap-1 tracking-tighter">
-<img src={logoFull} width={150} height={150} />
-</div>
-</div>
-{/* Avatar Genérico */}
-<div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white shadow-md overflow-hidden">
-<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" />
-</div>
-</header>
+<Header/>
 
 {/* ÁREA DE TÍTULOS */}
 <div className="px-6 pt-8 pb-6">

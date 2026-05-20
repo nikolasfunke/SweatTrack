@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
+import Header from "../components/Header";
 
 // ── small SVG icons ──────────────────────────────────────────────
 const PlusCircleIcon = () => (
@@ -123,15 +124,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 
-      {/* ── Top Bar ── */}
-      <header className="flex justify-between items-center p-6 bg-white shadow-sm">
-        <div className="flex items-center">
-          <img src={logoFull} width={150} height={150} alt="SweatTrack" />
-        </div>
-        <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white shadow overflow-hidden">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" />
-        </div>
-      </header>
+      <Header/>
 
       {/* ── Content ── */}
       <div className="px-6 pt-8 pb-6 flex flex-col gap-4">
@@ -146,7 +139,9 @@ function Dashboard() {
             whileTap={{ scale: 0.96 }}
             whileHover={{ scale: 1.03 }}
             className="mt-5 flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#DA0027] text-white text-sm font-bold tracking-wide shadow-[0_8px_20px_rgba(218,0,39,0.3)] hover:bg-red-700 active:scale-95 transition-all"
+            onClick={() => navigate("/PreSessao")}
           >
+           
             <PlusCircleIcon />
             NOVA SESSÃO
           </motion.button>

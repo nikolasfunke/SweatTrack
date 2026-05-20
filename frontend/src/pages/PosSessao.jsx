@@ -1,28 +1,15 @@
 import React from 'react';
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
+import Header from "../components/Header";
 
 function PosSessao() {
 
 return (
 
 <div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
+<Header/>
 
-{/* HEADER */}
-<header className="flex justify-between items-center px-6 py-5 bg-[#F5F5F5] border-b border-black/[0.03]">
-
-<div className="flex items-center">
-<img src={logoFull} width={120} />
-</div>
-
-<div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white shadow overflow-hidden">
-<img
-src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-alt="User"
-/>
-</div>
-
-</header>
 
 {/* TITULO */}
 <div className="px-6 pt-6">

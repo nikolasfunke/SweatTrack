@@ -46,6 +46,8 @@ function HydrationRing({ percent = 82 }) {
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - percent / 100);
 
+
+
   return (
     <div className="flex items-center justify-center my-4">
       <svg width="140" height="140" viewBox="0 0 140 140">

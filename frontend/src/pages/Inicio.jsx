@@ -46,7 +46,7 @@ function Inicio() {
           initial={{ opacity: 0, y: -40 }}
           animate={{
             opacity: 1,
-            y: showForm ? -20 : 0, // leve ajuste quando abre o form
+            y: showForm ? -100 : 0, // leve ajuste quando abre o form
           }}
           transition={{ duration: 0.4 }}
           className="w-86 mx-auto mb-46 drop-shadow-md"
@@ -82,7 +82,7 @@ function Inicio() {
             <motion.form
               key={formType}
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: -140 }}
+              animate={{ opacity: 1, y: -240 }}
               exit={{ opacity: 0, y: -40 }}
               className="flex flex-col gap-4 overflow-hidden"
             >
@@ -140,7 +140,7 @@ function Inicio() {
                 <>
                   <input
                     placeholder="Email"
-                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-red-500"
                   />
                   <input
                     type="password"

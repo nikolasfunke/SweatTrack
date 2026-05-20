@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
+import { IoReturnDownBackOutline } from "react-icons/io5";
 
 function DuranteSessao() {
 
@@ -48,7 +49,7 @@ return (
 		onClick={() => navigate("/PreSessao")}
 		className="absolute left-6 top-1 flex items-center gap-2 px-2 py-1 rounded-xl bg-[#DA0027] text-white text-xs font-bold shadow-[0_4px_12px_rgba(218,0,39,0.18)] hover:bg-red-700"
 	>
-		<span className="text-base">←</span>
+		<span className="text-base"><IoReturnDownBackOutline /></span>
 		<span className="hidden sm:inline">Voltar</span>
 	</button>
 

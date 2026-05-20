@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
@@ -96,6 +97,7 @@ function SessionCard({ icon, title, date, duration, intensity, intensityColor })
 
 // ── Main Component ───────────────────────────────────────────────
 function Dashboard() {
+  const navigate = useNavigate();
   const sessions = [
     {
       icon: <RunnerIcon color="#c0392b" />,

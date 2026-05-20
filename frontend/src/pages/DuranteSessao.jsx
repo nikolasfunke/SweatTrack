@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
-import Header from "../components/Header";
 
 function DuranteSessao() {
 
-const [tempo, setTempo] = useState(255);
+	const navigate = useNavigate();
+
+	const [tempo, setTempo] = useState(255);
 const [ingestaoSelecionada, setIngestaoSelecionada] = useState(250);
 
 const [mostrarModal, setMostrarModal] = useState(false);
@@ -37,7 +39,27 @@ return (
 
 <div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 
-<Header/>
+<header className="relative flex items-center justify-center p-6 bg-white shadow-sm h-24">
+
+	<img src={logoFull} width={150} height={150} className="absolute left-1/2 transform -translate-x-1/2 translate-y-1" />
+
+	<button
+		type="button"
+		onClick={() => navigate("/PreSessao")}
+		className="absolute left-6 top-1 flex items-center gap-2 px-2 py-1 rounded-xl bg-[#DA0027] text-white text-xs font-bold shadow-[0_4px_12px_rgba(218,0,39,0.18)] hover:bg-red-700"
+	>
+		<span className="text-base">←</span>
+		<span className="hidden sm:inline">Voltar</span>
+	</button>
+
+	<div className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-800 border-2 border-white shadow-md overflow-hidden">
+		<img
+			src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+			alt="User"
+		/>
+	</div>
+
+</header>
 
 {/* TITULO */}
 <div className="px-6 pt-6">

@@ -2,8 +2,11 @@ import React from 'react';
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 
 function PosSessao() {
+
+const navigate = useNavigate();
 
 return (
 
@@ -261,7 +264,10 @@ Baseado em dados de temperatura e intensidade da sessão.
 {/* BOTÃO */}
 <div className="px-6 mt-8">
 
-<button className="w-full py-5 rounded-2xl bg-[#E3002B] text-white font-black text-sm tracking-wide shadow-[0_10px_25px_rgba(227,0,43,0.25)] hover:bg-red-700 active:scale-95 transition-all">
+<button
+onClick={() => navigate("/HistoricoSessoes")}
+className="w-full py-5 rounded-2xl bg-[#E3002B] text-white font-black text-sm tracking-wide shadow-[0_10px_25px_rgba(227,0,43,0.25)] hover:bg-red-700 active:scale-95 transition-all"
+>
 SALVAR NO PRONTUÁRIO
 </button>
 

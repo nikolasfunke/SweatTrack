@@ -6,6 +6,7 @@ import PreSessao from './pages/PreSessao'
 import DuranteSessao from './pages/DuranteSessao'
 import PosSessao from './pages/PosSessao'
 import Perfil from './pages/Perfil'
+import HistoricoSessoes from './pages/HistoricoSessoes'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/DuranteSessao" element={<DuranteSessao />} />
       <Route path="/PosSessao" element={<PosSessao />} />
       <Route path="/Perfil" element={<Perfil />} />
+      <Route path="/HistoricoSessoes" element={<HistoricoSessoes />} />
     </Routes>
   );
 }

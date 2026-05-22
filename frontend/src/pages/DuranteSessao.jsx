@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import { IoReturnDownBackOutline } from "react-icons/io5";
+import PageTransition from "../components/PageTransition";
 
 function DuranteSessao() {
 
@@ -37,6 +38,8 @@ return `${hrs}:${mins}:${secs}`;
 const opcoesIngestao = [150, 250, 500];
 
 return (
+
+<PageTransition>
 
 <div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 
@@ -326,6 +329,8 @@ Salvar
 
 
 </div>
+
+</PageTransition>
 
 );
 

@@ -2,9 +2,13 @@ import React from 'react';
 import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
+import PageTransition from "../components/PageTransition";
 
 function Perfil() {
   return (
+
+<PageTransition>
+
     <div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 
       <Header/>
@@ -213,6 +217,9 @@ function Perfil() {
       <Navbar active="PERFIL" />
 
     </div>
+
+    </PageTransition>
+    
   );
 }
 

@@ -4,6 +4,7 @@ import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import PageTransition from "../components/PageTransition";
 
 function PreSessao() {
     const navigate = useNavigate();
@@ -24,6 +25,9 @@ const urineColors = [
 ];
 
 return (
+
+<PageTransition>
+
 // Container principal simulando a tela do celular com fundo off-white
 <div className="min-h-screen bg-[#F8F9FA] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 <Header/>
@@ -146,6 +150,9 @@ Sweat Track
 <Navbar active="monitorar" />
 
 </div>
+
+</PageTransition>
+
 );
 }
 

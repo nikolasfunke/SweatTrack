@@ -3,12 +3,15 @@ import logoFull from "../assets/logo_sweatTrack.svg";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
+import PageTransition from "../components/PageTransition";
 
 function PosSessao() {
 
 const navigate = useNavigate();
 
 return (
+
+    <PageTransition>
 
 <div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
 <Header/>
@@ -276,6 +279,8 @@ SALVAR NO PRONTUÁRIO
 <Navbar active="analises" />
 
 </div>
+
+</PageTransition>
 
 );
 

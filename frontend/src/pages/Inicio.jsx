@@ -6,6 +6,7 @@ import bgVideo from "../assets/bg_video_pre.mp4";
 import bgStatic from "../assets/bg_static.jpeg";
 import RunningShoe from "../components/Running-shoe";
 import Whistle from "../components/Whistle";
+import { IoReturnDownBackOutline } from "react-icons/io5";
 
 function Inicio() {
   const [formType, setFormType] = useState(null);
@@ -154,12 +155,14 @@ function Inicio() {
               )}
 
               <button
-                type="button"
-                onClick={() => setFormType(null)}
-                className="text-sm text-gray-900/90 mt-2 cursor-pointer hover:underline hover:text-gray-900 transition"
-              >
-                ← Voltar
-              </button>
+  type="button"
+  onClick={() => setFormType(null)}
+  className="mt-2 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#DA0027] text-white text-sm font-bold shadow-[0_4px_12px_rgba(218,0,39,0.18)] hover:bg-red-700 hover:scale-[1.02] active:scale-[0.98] transition-all"
+>
+  <IoReturnDownBackOutline className="text-base" />
+
+  Voltar
+</button>
             </motion.form>
           )}
         </AnimatePresence>

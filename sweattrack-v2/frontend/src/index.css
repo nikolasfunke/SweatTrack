@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Theme tokens ──────────────────────────────────── */
+:root {
+  --c-surface-0: 244 245 247;
+  --c-surface-1: 255 255 255;
+  --c-surface-2: 236 238 241;
+  --c-surface-3: 228 230 234;
+  --c-surface-4: 216 221 229;
+  --c-border:        rgba(0,0,0,0.08);
+  --c-border-bright: rgba(0,0,0,0.15);
+}
+.dark {
+  --c-surface-0: 8 8 8;
+  --c-surface-1: 17 17 17;
+  --c-surface-2: 26 26 26;
+  --c-surface-3: 34 34 34;
+  --c-surface-4: 42 42 42;
+  --c-border:        rgba(255,255,255,0.08);
+  --c-border-bright: rgba(255,255,255,0.15);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-surface-0 font-sans;
+    color: #ffffff;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  html:not(.dark) body { color: #111111; }
+
+  /* Light mode: flip text-white/* classes to near-black */
+  html:not(.dark) .text-white        { color: rgb(17 17 17)         !important; }
+  html:not(.dark) .text-white\/10    { color: rgb(17 17 17 / 0.10)  !important; }
+  html:not(.dark) .text-white\/20    { color: rgb(17 17 17 / 0.20)  !important; }
+  html:not(.dark) .text-white\/30    { color: rgb(17 17 17 / 0.30)  !important; }
+  html:not(.dark) .text-white\/40    { color: rgb(17 17 17 / 0.40)  !important; }
+  html:not(.dark) .text-white\/50    { color: rgb(17 17 17 / 0.50)  !important; }
+  html:not(.dark) .text-white\/55    { color: rgb(17 17 17 / 0.55)  !important; }
+  html:not(.dark) .text-white\/60    { color: rgb(17 17 17 / 0.60)  !important; }
+  html:not(.dark) .text-white\/70    { color: rgb(17 17 17 / 0.70)  !important; }
+  html:not(.dark) .text-white\/80    { color: rgb(17 17 17 / 0.80)  !important; }
+  /* Placeholder text in light mode */
+  html:not(.dark) input::placeholder,
+  html:not(.dark) textarea::placeholder { color: rgba(17,17,17,0.30); }
+  /* Light mode cards — stronger shadow + border for visibility */
+  html:not(.dark) .card {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06) !important;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { @apply bg-surface-1; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-4 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-primary; }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface-2/60 backdrop-blur-xl border border-border;
+  }
+  .card {
+    @apply bg-surface-1 border border-border rounded-2xl shadow-card;
+  }
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-hover active:scale-95 text-white font-semibold rounded-xl
+           px-5 py-3 transition-all duration-200 flex items-center justify-center gap-2
+           disabled:opacity-40 disabled:cursor-not-allowed shadow-red-glow;
+  }
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-3 text-white/70 hover:text-white font-medium rounded-xl
+           px-4 py-2.5 transition-all duration-200 flex items-center justify-center gap-2;
+  }
+  .btn-outline {
+    @apply border border-border-bright hover:border-primary text-white font-medium rounded-xl
+           px-4 py-2.5 transition-all duration-200 flex items-center justify-center gap-2
+           hover:bg-primary/10;
+  }
+  .input-field {
+    @apply w-full bg-surface-2 border border-border rounded-xl px-4 py-3 text-white
+           placeholder:text-white/30 focus:outline-none focus:border-primary
+           focus:ring-1 focus:ring-primary/50 transition-all duration-200;
+  }
+  .label {
+    @apply text-xs font-semibold uppercase tracking-widest text-white/40 mb-1.5 block;
+  }
+  .stat-value {
+    @apply text-3xl font-black tabular-nums leading-none;
+  }
+  .stat-unit {
+    @apply text-sm font-medium text-white/50 ml-0.5;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+  .page-container {
+    @apply max-w-md mx-auto px-4 pb-24 pt-4 md:max-w-none md:px-6 md:pb-6;
+  }
+  .section-title {
+    @apply text-xs font-bold uppercase tracking-widest text-white/40 mb-3;
+  }
+  .nav-link {
+    @apply flex flex-col items-center gap-0.5 text-xs font-medium transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-rose-400 bg-clip-text text-transparent;
+  }
+  .glow-red {
+    filter: drop-shadow(0 0 8px rgba(196,30,58,0.5));
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}

@@ -11,7 +11,7 @@ const FEATURES = [
   { icon: Droplets,  label: 'Monitoramento hídrico em tempo real' },
   { icon: Activity,  label: 'Taxa de sudorese e déficit calórico' },
   { icon: BarChart3, label: 'Relatórios clínicos exportáveis' },
-  { icon: Shield,    label: 'Protocolo São Camilo v1.1' },
+  { icon: Shield,    label: 'Protocolo Sweat Track v1.1' },
 ];
 
 export default function Login() {
@@ -73,7 +73,7 @@ export default function Login() {
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 mb-10 self-start">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             <span className="text-white text-[10px] font-bold uppercase tracking-widest">
-              São Camilo — Nutri-Esportiva
+              Sweat Track
             </span>
           </div>
 
@@ -106,7 +106,7 @@ export default function Login() {
 
           {/* Footer label */}
           <p className="hidden md:block text-white/30 text-[10px] font-bold uppercase tracking-widest mt-10">
-            PROTOCOLO SÃO CAMILO v1.1
+            PROTOCOLO SWEAT TRACK v1.1
           </p>
         </div>
 
@@ -208,7 +208,7 @@ export default function Login() {
 
           {/* Bottom protocol label on mobile */}
           <p className="md:hidden text-center text-[10px] text-white/20 font-bold uppercase tracking-widest mt-10">
-            PROTOCOLO SÃO CAMILO v1.1
+            PROTOCOLO SWEAT TRACK v1.1
           </p>
         </motion.div>
       </div>

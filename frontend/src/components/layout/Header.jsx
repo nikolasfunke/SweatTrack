@@ -9,7 +9,7 @@ export default function Header({ title, showBack = false, actions }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const clinicName = user?.clinicName || 'São Camilo';
+  const clinicName = user?.clinicName || 'Sweat-Track';
 
   return (
     <header className="sticky top-0 z-30 bg-surface-0/90 backdrop-blur-xl border-b border-border">

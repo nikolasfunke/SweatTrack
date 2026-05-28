@@ -93,7 +93,7 @@ export default function Profile() {
               <Input label="Nome completo" value={form.name} onChange={set('name')}
                 icon={<User size={15} />} />
               <Input label="Clínica / Instituição" value={form.clinicName} onChange={set('clinicName')}
-                placeholder="São Camilo" />
+                placeholder="Sweat-Track" />
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Data de Nascimento" type="date" value={form.birthDate}
                   onChange={set('birthDate')} icon={<Calendar size={15} />} />

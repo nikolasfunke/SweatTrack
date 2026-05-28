@@ -160,7 +160,7 @@ export default function PreSession() {
 
           {/* Protocol label */}
           <motion.div variants={fadeUp} className="text-center text-xs text-white/20 font-medium">
-            PROTOCOLO SÃO CAMILO v1.1
+            PROTOCOLO SWEAT-TRACK v1.1
           </motion.div>
 
           {/* Actions */}

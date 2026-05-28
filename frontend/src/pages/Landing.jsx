@@ -8,7 +8,7 @@ const FEATURES = [
   { icon: Droplets, title: 'Monitoramento Hídrico', desc: 'Rastreie sua hidratação em tempo real com cálculo preciso da taxa de sudorese.' },
   { icon: Activity, title: 'Sessões Inteligentes', desc: 'Pré, durante e pós-sessão com protocolos baseados em evidências científicas.' },
   { icon: BarChart3, title: 'Analytics Avançado', desc: 'Relatórios de performance, tendências e recomendações personalizadas.' },
-  { icon: Shield, title: 'Protocolo Clínico', desc: 'Tecnologia São Camilo para análise termoregulatória de alta precisão.' },
+  { icon: Shield, title: 'Protocolo Clínico', desc: 'Tecnologia Sweat-Track para análise termoregulatória de alta precisão.' },
 ];
 
 const stagger = {
@@ -48,7 +48,7 @@ export default function Landing() {
           <motion.div variants={fadeUp}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-slow" />
-              Tecnologia São Camilo
+              Tecnologia Sweat-Track
             </span>
           </motion.div>
 
@@ -195,7 +195,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-border py-8 px-6 text-center text-xs text-white/20">
         <Logo size="sm" className="justify-center mb-3" />
-        <p>© 2025 SweatTrack — Tecnologia São Camilo. Todos os direitos reservados.</p>
+        <p>© 2025 SweatTrack — Tecnologia Sweat-Track. Todos os direitos reservados.</p>
       </footer>
     </div>
   );

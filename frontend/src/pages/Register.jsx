@@ -114,7 +114,7 @@ export default function Register() {
           {form.role === 'coach' && (
             <Input
               label="Clínica / Instituição"
-              placeholder="São Camilo Sports"
+              placeholder="Sweat-Track Sports"
               value={form.clinicName}
               onChange={set('clinicName')}
               icon={<Building2 size={16} />}

@@ -1,10 +1,9 @@
--- SweatTrack v2 - MySQL Schema
--- Run: mysql -u root < sweattrack-v2\database\schema.sql
+-- rodar: mysql -u root -p < database/schema.sql
 
 CREATE DATABASE IF NOT EXISTS sweattrack CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE sweattrack;
 
--- Users
+-- Usuários
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
@@ -17,8 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-
--- Athlete profiles
+-- Perfil ateta
 CREATE TABLE IF NOT EXISTS athlete_profiles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL UNIQUE,
@@ -32,30 +30,30 @@ CREATE TABLE IF NOT EXISTS athlete_profiles (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Sessions
+-- sessão
 CREATE TABLE IF NOT EXISTS sessions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   session_type ENUM('training','match','recovery') DEFAULT 'training',
   intensity ENUM('baixa','moderada','alta','variada') DEFAULT 'moderada',
   status ENUM('pre','active','completed') DEFAULT 'pre',
-  -- Pre-session data
+  -- info pre-sesssao
   pre_weight_kg DECIMAL(5,2),
   urine_color TINYINT COMMENT '1-8 WUTS scale',
   thirst_level TINYINT COMMENT '0-10',
   ambient_temp DECIMAL(4,1),
   humidity TINYINT,
-  -- Active monitoring
+  -- monitoramento
   internal_temp DECIMAL(4,1),
-  -- Post-session data
+  -- info pos-sessao
   post_weight_kg DECIMAL(5,2),
   total_fluid_intake_ml INT DEFAULT 0,
   duration_minutes INT,
-  -- Calculated
+  --calculo
   sweat_rate_lh DECIMAL(4,2),
   hydric_deficit_ml INT,
   sodium_loss_mg INT,
-  -- Timestamps
+  -- timestamp
   started_at TIMESTAMP NULL,
   ended_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -63,7 +61,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Fluid ingestion log (during sessions)
 CREATE TABLE IF NOT EXISTS fluid_logs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   session_id INT NOT NULL,
@@ -73,7 +70,6 @@ CREATE TABLE IF NOT EXISTS fluid_logs (
   FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
--- Meal plans
 CREATE TABLE IF NOT EXISTS meal_plans (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -85,7 +81,6 @@ CREATE TABLE IF NOT EXISTS meal_plans (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Meals within a plan
 CREATE TABLE IF NOT EXISTS meals (
   id INT AUTO_INCREMENT PRIMARY KEY,
   plan_id INT NOT NULL,
@@ -94,7 +89,6 @@ CREATE TABLE IF NOT EXISTS meals (
   FOREIGN KEY (plan_id) REFERENCES meal_plans(id) ON DELETE CASCADE
 );
 
--- Food items
 CREATE TABLE IF NOT EXISTS food_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   meal_id INT NOT NULL,
@@ -109,7 +103,6 @@ CREATE TABLE IF NOT EXISTS food_items (
   FOREIGN KEY (meal_id) REFERENCES meals(id) ON DELETE CASCADE
 );
 
--- Hydration records (daily)
 CREATE TABLE IF NOT EXISTS hydration_records (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -123,7 +116,7 @@ CREATE TABLE IF NOT EXISTS hydration_records (
   UNIQUE KEY unique_user_date (user_id, record_date)
 );
 
--- Notifications / alerts
+-- nots
 CREATE TABLE IF NOT EXISTS notifications (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -135,22 +128,12 @@ CREATE TABLE IF NOT EXISTS notifications (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Seed a demo user (password: demo1234)
-UPDATE users
-SET
-  name = 'Dr. Silva',
-  password_hash = '$2b$10$R.9DM6usOhPhXS3OzMcxL.aZFaz77JI7kMgy4JNOwArimNGapOcHC',
-  role = 'doctor',
-  clinic_name = 'São Camilo'
-WHERE email = 'demo@sweattrack.com';
-
-INSERT INTO users (name, email, password_hash, role, clinic_name)
-SELECT
+-- user demo (password: demo1234)
+INSERT IGNORE INTO users (name, email, password_hash, role, clinic_name)
+VALUES (
   'Dr. Silva',
   'demo@sweattrack.com',
   '$2b$10$R.9DM6usOhPhXS3OzMcxL.aZFaz77JI7kMgy4JNOwArimNGapOcHC',
   'doctor',
   'São Camilo'
-WHERE NOT EXISTS (
-  SELECT 1 FROM users WHERE email = 'demo@sweattrack.com'
 );

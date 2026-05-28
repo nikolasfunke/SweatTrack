@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { getHydrationStatus } from '../../utils/calculos';
+import { getHydrationStatus } from '../../utils/calculations';
 
-export default function MedidorHidratacao({ value = 82, size = 160 }) {
+export default function HydrationGauge({ value = 82, size = 160 }) {
   const status = getHydrationStatus(value);
   const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius;

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { URINE_COLORS } from '../../utils/calculos';
+import { URINE_COLORS } from '../../utils/calculations';
 
-export default function EscalaUrina({ selected, onChange }) {
+export default function UrineScale({ selected, onChange }) {
   return (
     <div className="space-y-2">
       <div className="flex gap-1.5">

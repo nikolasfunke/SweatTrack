@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/ContextoAutenticacao';
+import { useAuth } from '../../contexts/AuthContext';
 import Logo from './Logo';
-import PopupNotificacao from '../ui/PopupNotificacao';
+import NotificationPopup from '../ui/NotificationPopup';
 
-export default function Cabecalho({ title, showBack = false, actions }) {
+export default function Header({ title, showBack = false, actions }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -53,10 +53,14 @@ export default function Cabecalho({ title, showBack = false, actions }) {
         {/* Right */}
         <div className="flex items-center gap-2">
           {actions}
-          <PopupNotificacao />
-          <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
+          <NotificationPopup />
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0 hover:bg-primary/30 transition-colors"
+            title="Meu perfil"
+          >
             {user?.name?.[0]?.toUpperCase() || 'U'}
-          </div>
+          </button>
         </div>
       </div>
     </header>

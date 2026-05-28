@@ -1,18 +1,21 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function Logo({ size = 'md', className = '' }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const navigate = useNavigate();
   const heights = { sm: 'h-7', md: 'h-8', lg: 'h-10', xl: 'h-12' };
 
   return (
     <motion.div
-      className={`flex items-center ${className}`}
+      onClick={() => navigate('/dashboard')}
+      className={`flex items-center cursor-pointer ${className}`}
       whileHover={{ scale: 1.02 }}
     >
       {!imgFailed ? (
         <img
-          src="/logo.png"
+          src="/favicon.svg"
           alt="Sweat-Track"
           className={`${heights[size]} w-auto object-contain`}
           onError={() => setImgFailed(true)}

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-export default function Cartao({ children, className = '', onClick, hover = false, glow = false }) {
+export default function Card({ children, className = '', onClick, hover = false, glow = false }) {
   const base = `card p-4 ${glow ? 'shadow-red-glow border-primary/30' : ''} ${className}`;
   if (onClick || hover) {
     return (

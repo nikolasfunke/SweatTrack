@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import { Activity, Clock, ChevronRight } from 'lucide-react';
+import { Activity, Clock, Flame, ChevronRight } from 'lucide-react';
 import Badge from '../ui/Badge';
-import { formatDuration, relativeDate, INTENSITY_LABELS } from '../../utils/calculos';
+import { formatDuration, relativeDate, INTENSITY_LABELS } from '../../utils/calculations';
 
-export default function CartaoSessao({ session, onClick }) {
+export default function SessionCard({ session, onClick }) {
   const intensity = session.intensity || 'moderada';
   const badgeVariant = intensity === 'alta' ? 'alta' : intensity === 'moderada' ? 'moderada' : 'baixa';
 

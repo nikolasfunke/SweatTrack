@@ -1,7 +1,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
-import { useTheme } from '../../contexts/ContextoTema';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // day_num from MySQL DAYOFWEEK: 1=Sun, 2=Mon … 7=Sat
 const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -31,7 +31,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function GraficoSemanal({ weeklyData }) {
+export default function WeeklyChart({ weeklyData }) {
   const data = buildChartData(weeklyData);
   // today's day_num in MySQL convention (1=Sun … 7=Sat)
   const todayDayNum = new Date().getDay() + 1;

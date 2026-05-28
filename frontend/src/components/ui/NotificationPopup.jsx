@@ -19,7 +19,7 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff / 86400)}d`;
 }
 
-export default function PopupNotificacao() {
+export default function NotificationPopup() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -147,7 +147,7 @@ export default function PopupNotificacao() {
             {/* Footer */}
             {notifications.length > 0 && (
               <button
-                onClick={() => { setOpen(false); navigate('/notificacoes'); }}
+                onClick={() => { setOpen(false); navigate('/notifications'); }}
                 className="w-full flex items-center justify-center gap-1.5 py-3 text-xs font-bold text-primary hover:bg-primary/5 transition-colors border-t border-border"
               >
                 Ver todas as notificações <ChevronRight size={13} />

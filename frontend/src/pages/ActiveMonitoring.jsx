@@ -20,11 +20,43 @@ export default function ActiveMonitoring() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [elapsed, setElapsed] = useState(0);
-  const [fluidLogs, setFluidLogs] = useState([]);
-  const [totalFluid, setTotalFluid] = useState(0);
+  // ── localStorage keys (all scoped to this session id) ──────────────────────
+  const keyStart    = `session_start_${id}`;
+  const keyLogs     = `session_logs_${id}`;
+  const keyTotal    = `session_total_${id}`;
+  const keyDeficit  = `session_deficit_${id}`;
+
+  // ── Persistent timer ─────────────────────────────────────────────────────────
+  const getOrCreateStartTime = () => {
+    const stored = localStorage.getItem(keyStart);
+    if (stored) return parseInt(stored, 10);
+    const now = Date.now();
+    localStorage.setItem(keyStart, String(now));
+    return now;
+  };
+
+  const startTimeRef = useRef(null);
+  const [elapsed, setElapsed] = useState(() => {
+    const start = getOrCreateStartTime();
+    startTimeRef.current = start;
+    return Math.floor((Date.now() - start) / 1000);
+  });
+
+  // ── Persistent fluid state ───────────────────────────────────────────────────
+  const [fluidLogs, setFluidLogs] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(keyLogs)) || []; }
+    catch { return []; }
+  });
+  const [totalFluid, setTotalFluid] = useState(() => {
+    const v = localStorage.getItem(keyTotal);
+    return v ? parseInt(v, 10) : 0;
+  });
+  const [hydricDeficit, setHydricDeficit] = useState(() => {
+    const v = localStorage.getItem(keyDeficit);
+    return v ? parseInt(v, 10) : -450;
+  });
+
   const [sweatRate, setSweatRate] = useState(1.4);
-  const [hydricDeficit, setHydricDeficit] = useState(-450);
   const [showFinish, setShowFinish] = useState(false);
   const [showFluid, setShowFluid] = useState(false);
   const [customFluid, setCustomFluid] = useState('');
@@ -35,7 +67,10 @@ export default function ActiveMonitoring() {
   const tickRef = useRef(null);
 
   useEffect(() => {
-    tickRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+    if (!startTimeRef.current) startTimeRef.current = getOrCreateStartTime();
+    tickRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
     return () => clearInterval(tickRef.current);
   }, []);
 
@@ -78,9 +113,23 @@ export default function ActiveMonitoring() {
     try {
       await sessionApi.logFluid(id, { amountMl: ml, drinkType: 'water' });
       const entry = { id: Date.now(), ml, time: formatTimer(elapsed) };
-      setFluidLogs((l) => [entry, ...l]);
-      setTotalFluid((t) => t + ml);
-      setHydricDeficit((d) => d + ml);
+
+      setFluidLogs((l) => {
+        const next = [entry, ...l];
+        localStorage.setItem(keyLogs, JSON.stringify(next));
+        return next;
+      });
+      setTotalFluid((t) => {
+        const next = t + ml;
+        localStorage.setItem(keyTotal, String(next));
+        return next;
+      });
+      setHydricDeficit((d) => {
+        const next = d + ml;
+        localStorage.setItem(keyDeficit, String(next));
+        return next;
+      });
+
       toast(`+${ml}ml registrado`, 'success');
       setShowFluid(false);
       setCustomFluid('');
@@ -97,6 +146,11 @@ export default function ActiveMonitoring() {
         durationMinutes: Math.round(elapsed / 60),
         ambientTemp: ambientTemp ?? undefined,
       });
+      // Clear all persisted session data after session ends
+      localStorage.removeItem(keyStart);
+      localStorage.removeItem(keyLogs);
+      localStorage.removeItem(keyTotal);
+      localStorage.removeItem(keyDeficit);
       toast('Sessão finalizada com sucesso', 'success');
       if (isMobileViewport()) {
         navigate(`/post-session/${id}`, { replace: true });

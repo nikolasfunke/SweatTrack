@@ -1,5 +1,5 @@
 -- SweatTrack v2 - MySQL Schema
--- Run: mysql -u root -p < database/schema.sql
+-- Run: mysql -u root < sweattrack-v2\database\schema.sql
 
 CREATE DATABASE IF NOT EXISTS sweattrack CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE sweattrack;

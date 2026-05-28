@@ -179,6 +179,10 @@ export default function History() {
         session={selected}
         open={!!selected}
         onClose={() => setSelected(null)}
+        onDeleted={() => {
+          setSelected(null);
+          sessionApi.list().then((r) => setSessions(r.data)).catch(() => {});
+        }}
       />
     </AppLayout>
   );

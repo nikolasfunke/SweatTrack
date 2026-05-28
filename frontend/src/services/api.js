@@ -54,14 +54,6 @@ export const analyticsApi = {
   sessionsHistory: (limit = 20) => api.get('/analytics/sessions-history', { params: { limit } }),
 };
 
-// Meals
-export const mealApi = {
-  list: (date) => api.get('/meals', { params: { date } }),
-  getOne: (id) => api.get(`/meals/${id}`),
-  create: (data) => api.post('/meals', data),
-  delete: (id) => api.delete(`/meals/${id}`),
-};
-
 // Users
 export const userApi = {
   updateProfile: (data) => api.put('/users/profile', data),

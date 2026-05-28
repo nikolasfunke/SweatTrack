@@ -1,12 +1,14 @@
-import { motion } from 'framer-motion';
-import { ChevronLeft, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Info, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import Logo from './Logo';
 import NotificationPopup from '../ui/NotificationPopup';
 
 export default function Header({ title, showBack = false, actions }) {
   const { user } = useAuth();
+  const { dark, toggle: toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const clinicName = user?.clinicName || 'Sweat-Track';
@@ -51,6 +53,24 @@ export default function Header({ title, showBack = false, actions }) {
         {/* Right */}
         <div className="flex items-center gap-2">
           {actions}
+          <button
+            onClick={toggleTheme}
+            className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center hover:bg-surface-3 transition-colors flex-shrink-0 overflow-hidden"
+            title={dark ? 'Modo claro' : 'Modo escuro'}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={dark ? 'moon' : 'sun'}
+                initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center justify-center"
+              >
+                {dark ? <Moon size={15} className="text-white/60" /> : <Sun size={15} className="text-amber-500" />}
+              </motion.span>
+            </AnimatePresence>
+          </button>
           <NotificationPopup />
           <button
             onClick={() => navigate('/profile')}

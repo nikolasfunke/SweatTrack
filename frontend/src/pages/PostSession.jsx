@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Zap,
+  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Trash2,
 } from 'lucide-react';
 import { sessionApi } from '../services/api';
 import { printSessionReport } from '../utils/printReport';
+import { ConfirmModal } from '../components/ui/Modal';
 import {
   calcRecoveryFluid,
   formatDuration,
@@ -28,6 +29,8 @@ export default function PostSession() {
   const toast = useToast();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     sessionApi.getOne(id)
@@ -53,6 +56,16 @@ export default function PostSession() {
   }
 
   if (!session) return null;
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await sessionApi.delete(session.id);
+      navigate('/monitor', { replace: true });
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const intensity = session.intensity || 'moderada';
   const intensityColor = INTENSITY_COLOR[intensity] ?? '#C41E3A';
@@ -129,12 +142,6 @@ export default function PostSession() {
               hintClass={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
             />
             <MetricCard
-              icon={<Zap size={14} className="text-amber-400" />}
-              label="Perda de Sódio"
-              value={session.sodium_loss_mg ? `${session.sodium_loss_mg} mg` : '—'}
-              hint={session.sodium_loss_mg ? 'Estimativa da sessão' : 'Sem cálculo'}
-            />
-            <MetricCard
               icon={<Droplets size={14} className="text-sky-400" />}
               label="Ingestão Total"
               value={`${session.total_fluid_intake_ml ?? 0} ml`}
@@ -172,8 +179,7 @@ export default function PostSession() {
                 Recuperação Recomendada
               </p>
               <p className="mt-2 text-sm leading-relaxed text-white/70">
-                Consuma <span className="font-bold text-white">{recoveryMl}ml</span> de fluidos nas próximas 4 horas
-                {session.sodium_loss_mg > 1500 ? ' com reposição eletrolítica.' : ' para repor as perdas da sessão.'}
+                Consuma <span className="font-bold text-white">{recoveryMl}ml</span> de fluidos nas próximas 4 horas para repor as perdas da sessão.
               </p>
             </div>
           ) : (
@@ -199,8 +205,24 @@ export default function PostSession() {
               Exportar PDF
             </Button>
           </div>
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="w-full flex items-center justify-center gap-1.5 text-rose-400/50 hover:text-rose-400 text-xs font-medium py-1 transition-colors"
+          >
+            <Trash2 size={11} />
+            Deletar treino
+          </button>
         </motion.div>
       </div>
+
+      <ConfirmModal
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        title="Deletar treino?"
+        message="Esta ação não pode ser desfeita. O treino e todos os dados associados serão removidos permanentemente."
+      />
     </AppLayout>
   );
 }

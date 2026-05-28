@@ -7,11 +7,9 @@ function calcSweatMetrics({ preWeight, postWeight, fluidIntakeMl, durationMin })
   const totalSweatLiters = weightLossKg + fluidIntakeLiters;
   const sweatRateLh = durationMin > 0 ? (totalSweatLiters / (durationMin / 60)) : 0;
   const hydricDeficitMl = Math.round(weightLossKg * 1000);
-  const sodiumLossMg = Math.round(totalSweatLiters * 1150); 
   return {
     sweatRateLh: parseFloat(sweatRateLh.toFixed(2)),
     hydricDeficitMl,
-    sodiumLossMg,
     totalFluidLoss: parseFloat(totalSweatLiters.toFixed(2)),
   };
 }
@@ -145,13 +143,13 @@ exports.finish = async (req, res) => {
     await db.query(
       `UPDATE sessions SET status = "completed", ended_at = NOW(),
        post_weight_kg = ?, duration_minutes = ?,
-       sweat_rate_lh = ?, hydric_deficit_ml = ?, sodium_loss_mg = ?,
+       sweat_rate_lh = ?, hydric_deficit_ml = ?,
        internal_temp = COALESCE(?, internal_temp),
        ambient_temp = COALESCE(?, ambient_temp)
        WHERE id = ? AND user_id = ?`,
       [
         normalizedPostWeight, durationMinutes,
-        metrics.sweatRateLh ?? null, metrics.hydricDeficitMl ?? null, metrics.sodiumLossMg ?? null,
+        metrics.sweatRateLh ?? null, metrics.hydricDeficitMl ?? null,
         internalTemp || null, ambientTemp || null,
         req.params.id, req.userId,
       ]

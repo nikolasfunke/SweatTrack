@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import {
-  Activity, Clock, Droplets, TrendingDown, Thermometer, Zap, Scale, Download,
+  Activity, Clock, Droplets, TrendingDown, Thermometer, Scale, Download, Trash2,
 } from 'lucide-react';
-import Modal from '../ui/Modal';
+import Modal, { ConfirmModal } from '../ui/Modal';
 import Button from '../ui/Button';
 import { printSessionReport } from '../../utils/printReport';
+import { sessionApi } from '../../services/api';
 import {
   formatDuration, relativeDate, INTENSITY_LABELS,
   getSweatRateLabel, calcRecoveryFluid,
@@ -12,15 +14,17 @@ import {
 const SESSION_TYPE_LABEL = { training: 'Treino', match: 'Jogo', recovery: 'Recuperação' };
 const INTENSITY_COLOR = { baixa: '#34d399', moderada: '#fbbf24', alta: '#f87171', variada: '#a78bfa' };
 
-export default function SessionDetailModal({ session, open, onClose }) {
+export default function SessionDetailModal({ session, open, onClose, onDeleted }) {
   return (
     <Modal open={open} onClose={onClose} size="full">
-      {session && <SessionDetailContent session={session} onClose={onClose} />}
+      {session && <SessionDetailContent session={session} onClose={onClose} onDeleted={onDeleted} />}
     </Modal>
   );
 }
 
-function SessionDetailContent({ session, onClose }) {
+function SessionDetailContent({ session, onClose, onDeleted }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const sweatLabel = getSweatRateLabel(session.sweat_rate_lh);
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
   const recoveryMl = deficitMl > 0 ? calcRecoveryFluid(deficitMl) : null;
@@ -29,6 +33,18 @@ function SessionDetailContent({ session, onClose }) {
   const sessionDate = session.ended_at
     ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     : relativeDate(session.created_at);
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await sessionApi.delete(session.id);
+      setShowConfirm(false);
+      onClose();
+      onDeleted?.();
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="space-y-4 -mt-1">
@@ -73,11 +89,6 @@ function SessionDetailContent({ session, onClose }) {
           value={session.hydric_deficit_ml ? `${(deficitMl / 1000).toFixed(2)} L` : '—'}
           sub={deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Normal' : undefined}
           subColor={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
-        />
-        <MetricTile
-          icon={<Zap size={14} className="text-amber-400" />}
-          label="Perda de Sódio"
-          value={session.sodium_loss_mg ? `${session.sodium_loss_mg} mg` : '—'}
         />
         <MetricTile
           icon={<Thermometer size={14} className="text-violet-400" />}
@@ -135,8 +146,7 @@ function SessionDetailContent({ session, onClose }) {
             Recomendação de Recuperação
           </p>
           <p className="text-xs text-white/60 leading-relaxed">
-            Consumir <span className="text-white font-bold">{recoveryMl}ml</span> de fluidos nas próximas 4 horas
-            {session.sodium_loss_mg > 1500 ? ' com sachê eletrolítico isotônico.' : ' para reposição completa.'}
+            Consumir <span className="text-white font-bold">{recoveryMl}ml</span> de fluidos nas próximas 4 horas para reposição completa.
           </p>
         </div>
       )}
@@ -148,6 +158,22 @@ function SessionDetailContent({ session, onClose }) {
           Exportar PDF
         </Button>
       </div>
+      <button
+        onClick={() => setShowConfirm(true)}
+        className="w-full flex items-center justify-center gap-1.5 text-rose-400/50 hover:text-rose-400 text-xs font-medium py-1 transition-colors"
+      >
+        <Trash2 size={11} />
+        Deletar treino
+      </button>
+
+      <ConfirmModal
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        title="Deletar treino?"
+        message="Esta ação não pode ser desfeita. O treino e todos os dados associados serão removidos permanentemente."
+      />
     </div>
   );
 }

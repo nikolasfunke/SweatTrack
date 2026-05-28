@@ -183,11 +183,6 @@ export default function Dashboard() {
                     subColor={sweatLabel.color}
                   />
                   <StatRow
-                    icon={<Droplets size={14} className="text-sky-400" />}
-                    label="Sódio"
-                    value={last?.sodium_loss_mg ? `${last.sodium_loss_mg} mg/L` : '—'}
-                  />
-                  <StatRow
                     icon={<Thermometer size={14} className="text-rose-400" />}
                     label="Temperatura"
                     value={last?.internal_temp ? `${last.internal_temp}°C` : '—'}
@@ -294,6 +289,11 @@ export default function Dashboard() {
         session={detailSession}
         open={!!detailSession}
         onClose={() => setDetailSession(null)}
+        onDeleted={() => {
+          setDetailSession(null);
+          analyticsApi.dashboard().then((r) => setAnalytics(r.data)).catch(() => {});
+          sessionApi.list().then((r) => setSessions(r.data)).catch(() => {});
+        }}
       />
 
       {/* New session modal */}

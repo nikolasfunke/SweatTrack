@@ -51,7 +51,6 @@ function intensityColor(v) {
 
 export function printSessionReport(session) {
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
-  const sodiumMg  = session.sodium_loss_mg ?? 0;
   const sweat     = parseFloat(session.sweat_rate_lh ?? 0);
   const duration  = session.duration_minutes ?? 0;
   const temp      = session.internal_temp;
@@ -88,11 +87,6 @@ export function printSessionReport(session) {
         <div class="sub ${deficitMl > 2000 ? 'alert' : 'ok'}">${deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Aceitável' : ''}</div>
       </div>
       <div class="card">
-        <div class="label">Perda de Sódio</div>
-        <div class="value">${sodiumMg > 0 ? sodiumMg+' mg' : '—'}</div>
-        <div class="sub ${sodiumMg > 1500 ? 'warn' : 'ok'}">${sodiumMg > 1500 ? 'Reposição recomendada' : sodiumMg > 0 ? 'Nível aceitável' : ''}</div>
-      </div>
-      <div class="card">
         <div class="label">Temperatura Interna</div>
         <div class="value ${temp ? tempClass : ''}">${temp ? temp+'°C' : '—'}</div>
         <div class="sub ${temp ? tempClass : ''}">${temp > 38.5 ? 'ALERTA' : temp ? 'Normal' : ''}</div>
@@ -109,7 +103,7 @@ export function printSessionReport(session) {
 
     <div class="section-title">Protocolo de Recuperação</div>
     <div class="step"><div class="step-num">1</div><div class="step-body"><div class="title">Reidratação Imediata</div><div class="desc">${recoveryMl ? `Consumir ${recoveryMl}ml de fluidos nas próximas 4 horas (150% da perda de ${(deficitMl/1000).toFixed(2)}L).` : 'Manter hidratação regular pós-sessão com 500–800ml de fluidos.'}</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="title">Reposição de Eletrólitos</div><div class="desc">${sodiumMg > 1500 ? `Perda estimada de ${sodiumMg}mg de sódio. Sachê eletrolítico isotônico recomendado.` : 'Alimentação normal de reposição de eletrólitos é suficiente.'}</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="title">Reposição de Eletrólitos</div><div class="desc">Alimentação normal de reposição de eletrólitos é suficiente. Para exercícios acima de 60 minutos, considere bebidas isotônicas.</div></div></div>
     <div class="step"><div class="step-num">3</div><div class="step-body"><div class="title">Monitoramento de Urina</div><div class="desc">Acompanhe a coloração da urina até atingir o tom amarelo-claro (Padrão 1–2 na escala de WUTS).</div></div></div>
 
     <div class="recovery-box">

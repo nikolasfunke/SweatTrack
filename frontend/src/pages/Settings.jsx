@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Bell, Lock, Globe, Smartphone, Moon, ChevronRight,
+  Bell, Lock, Globe, Smartphone, ChevronRight,
   LogOut, Trash2, Shield, HelpCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { userApi } from '../services/api';
 import AppLayout from '../components/layout/AppLayout';
 import Header from '../components/layout/Header';
@@ -53,7 +52,6 @@ function SettingRow({ icon, label, desc, children, onClick }) {
 
 export default function Settings() {
   const { logout } = useAuth();
-  const { dark, toggle: toggleTheme } = useTheme();
   const navigate = useNavigate();
   const toast = useToast();
   const [prefs, setPrefs] = useState({
@@ -108,9 +106,6 @@ export default function Settings() {
           {/* Appearance */}
           <Card>
             <p className="section-title mb-1">Aparência</p>
-            <SettingRow icon={<Moon size={15} />} label="Modo escuro" desc={dark ? 'Tema escuro ativo' : 'Tema claro ativo'}>
-              <Toggle checked={dark} onChange={toggleTheme} />
-            </SettingRow>
             <SettingRow icon={<Globe size={15} />} label="Unidades" desc={prefs.units === 'metric' ? 'Sistema métrico (kg, cm)' : 'Imperial (lb, in)'}>
               <button
                 onClick={() => setPrefs((p) => ({ ...p, units: p.units === 'metric' ? 'imperial' : 'metric' }))}

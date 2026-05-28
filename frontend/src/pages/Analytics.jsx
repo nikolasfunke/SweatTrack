@@ -479,15 +479,6 @@ export default function Analytics() {
                         : `Perda de ${(Math.abs(deficitMl) / 1000).toFixed(2)}L — dentro do aceitável. Reidratação de ${Math.round(Math.abs(deficitMl) * 1.5)}ml recomendada.`
                     }
                   />
-                  {/* Sodium note */}
-                  {lastSession.sodium_loss_mg && (
-                    <ClinicalNote
-                      icon="🧂"
-                      color="border-violet-500/20 bg-violet-500/5"
-                      title="Perda de Sódio"
-                      desc={`Perda estimada de ${lastSession.sodium_loss_mg}mg de sódio. ${lastSession.sodium_loss_mg > 1500 ? 'Sachê eletrolítico isotônico recomendado.' : 'Alimentação normal de reposição é suficiente.'}`}
-                    />
-                  )}
                 </>
               ) : (
                 <div className="border border-border rounded-2xl p-4 text-center text-xs text-white/30">

@@ -10,7 +10,7 @@ exports.getDashboard = async (req, res) => {
     );
 
     const [lastSession] = await db.query(
-      `SELECT sweat_rate_lh, hydric_deficit_ml, sodium_loss_mg, internal_temp, duration_minutes, ended_at
+      `SELECT sweat_rate_lh, hydric_deficit_ml, internal_temp, duration_minutes, ended_at
        FROM sessions WHERE user_id = ? AND status = "completed" ORDER BY ended_at DESC LIMIT 1`,
       [userId]
     );
@@ -130,7 +130,6 @@ exports.getSessionsHistory = async (req, res) => {
          duration_minutes,
          sweat_rate_lh,
          hydric_deficit_ml,
-         sodium_loss_mg,
          intensity,
          session_type,
          internal_temp,

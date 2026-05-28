@@ -52,7 +52,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   --calculo
   sweat_rate_lh DECIMAL(4,2),
   hydric_deficit_ml INT,
-  sodium_loss_mg INT,
   -- timestamp
   started_at TIMESTAMP NULL,
   ended_at TIMESTAMP NULL,
@@ -68,39 +67,6 @@ CREATE TABLE IF NOT EXISTS fluid_logs (
   drink_type ENUM('water','isotonic','electrolyte','other') DEFAULT 'water',
   logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS meal_plans (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  plan_date DATE NOT NULL,
-  plan_type ENUM('pre_training','pos_training','recovery','competition') DEFAULT 'pre_training',
-  title VARCHAR(200),
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS meals (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  plan_id INT NOT NULL,
-  meal_time ENUM('cafe_da_manha','lanche_manha','almoco','lanche_tarde','jantar','ceia','pre_treino','pos_treino') NOT NULL,
-  meal_time_actual TIME,
-  FOREIGN KEY (plan_id) REFERENCES meal_plans(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS food_items (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  meal_id INT NOT NULL,
-  name VARCHAR(200) NOT NULL,
-  quantity DECIMAL(8,2),
-  unit VARCHAR(50),
-  calories DECIMAL(8,2),
-  carbs_g DECIMAL(8,2),
-  protein_g DECIMAL(8,2),
-  fat_g DECIMAL(8,2),
-  sodium_mg DECIMAL(8,2),
-  FOREIGN KEY (meal_id) REFERENCES meals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS hydration_records (

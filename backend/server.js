@@ -30,7 +30,6 @@ app.use('/api/auth',      require('./src/routes/auth'));
 app.use('/api/sessions',  require('./src/routes/sessions'));
 app.use('/api/users',     require('./src/routes/users'));
 app.use('/api/analytics', require('./src/routes/analytics'));
-app.use('/api/meals',     require('./src/routes/meals'));
 app.use('/api/admin',     require('./src/routes/admin'));
 
 

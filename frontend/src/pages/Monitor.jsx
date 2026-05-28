@@ -259,6 +259,10 @@ export default function Monitor() {
         session={selectedSession}
         open={!!selectedSession}
         onClose={() => setSelectedSession(null)}
+        onDeleted={() => {
+          setSelectedSession(null);
+          sessionApi.list().then((r) => setSessions(r.data.slice(0, 5))).catch(() => {});
+        }}
       />
     </AppLayout>
   );

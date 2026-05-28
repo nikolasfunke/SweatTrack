@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, LayoutGroup } from 'framer-motion';
 import {
   Home, Activity, BarChart3, User, Settings,
-  Utensils, History, LogOut, Bell, Users,
+  History, LogOut, Bell, Users,
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,7 +11,6 @@ const NAV = [
   { to: '/dashboard',  label: 'Início',         icon: Home },
   { to: '/monitor',    label: 'Monitorar',       icon: Activity },
   { to: '/analytics',  label: 'Análises',        icon: BarChart3 },
-  { to: '/meal-plan',  label: 'Plano Alimentar', icon: Utensils },
   { to: '/history',    label: 'Histórico',       icon: History },
 ];
 

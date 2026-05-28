@@ -11,7 +11,6 @@ const PreSession       = lazy(() => import('./pages/PreSession'));
 const ActiveMonitoring = lazy(() => import('./pages/ActiveMonitoring'));
 const PostSession      = lazy(() => import('./pages/PostSession'));
 const Analytics        = lazy(() => import('./pages/Analytics'));
-const MealPlan         = lazy(() => import('./pages/MealPlan'));
 const History          = lazy(() => import('./pages/History'));
 const Monitor          = lazy(() => import('./pages/Monitor'));
 const Notifications    = lazy(() => import('./pages/Notifications'));
@@ -61,7 +60,6 @@ export default function App() {
           <Route path="/post-session/:id" element={<RequireAuth><PostSession /></RequireAuth>} />
           <Route path="/monitor"          element={<RequireAuth><Monitor /></RequireAuth>} />
           <Route path="/analytics"        element={<RequireAuth><Analytics /></RequireAuth>} />
-          <Route path="/meal-plan"        element={<RequireAuth><MealPlan /></RequireAuth>} />
           <Route path="/history"          element={<RequireAuth><History /></RequireAuth>} />
           <Route path="/notifications"    element={<RequireAuth><Notifications /></RequireAuth>} />
           <Route path="/profile"          element={<RequireAuth><Profile /></RequireAuth>} />

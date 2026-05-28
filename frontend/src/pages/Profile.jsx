@@ -17,7 +17,6 @@ export default function Profile() {
   const handleLogout = () => { logout(); window.location.href = '/'; };
   const [form, setForm] = useState({
     name: user?.name || '',
-    clinicName: user?.clinicName || '',
     heightCm: user?.profile?.heightCm || '',
     weightKg: user?.profile?.weightKg || '',
     sport: user?.profile?.sport || '',
@@ -34,7 +33,6 @@ export default function Profile() {
     try {
       await userApi.updateProfile({
         name: form.name,
-        clinicName: form.clinicName,
         heightCm: form.heightCm ? parseFloat(form.heightCm) : undefined,
         weightKg: form.weightKg ? parseFloat(form.weightKg) : undefined,
         sport: form.sport || undefined,
@@ -80,9 +78,6 @@ export default function Profile() {
               <span className="badge bg-primary/15 text-primary border border-primary/20">
                 {roleLabels[user?.role] || user?.role}
               </span>
-              {user?.clinicName && (
-                <span className="badge bg-surface-3 text-white/50">{user.clinicName}</span>
-              )}
             </div>
           </motion.div>
 
@@ -92,8 +87,6 @@ export default function Profile() {
             <div className="space-y-4">
               <Input label="Nome completo" value={form.name} onChange={set('name')}
                 icon={<User size={15} />} />
-              <Input label="Clínica / Instituição" value={form.clinicName} onChange={set('clinicName')}
-                placeholder="Sweat-Track" />
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Data de Nascimento" type="date" value={form.birthDate}
                   onChange={set('birthDate')} icon={<Calendar size={15} />} />

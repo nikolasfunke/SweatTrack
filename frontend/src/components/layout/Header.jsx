@@ -11,8 +11,6 @@ export default function Header({ title, showBack = false, actions }) {
   const { dark, toggle: toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const clinicName = user?.clinicName || 'Sweat-Track';
-
   return (
     <header className="sticky top-0 z-30 bg-surface-0/90 backdrop-blur-xl border-b border-border">
       <div className="flex items-center justify-between px-4 h-14">
@@ -30,7 +28,7 @@ export default function Header({ title, showBack = false, actions }) {
             <>
               {/* Logo — only on mobile (sidebar shows it on desktop) */}
               <div className="md:hidden">
-                <Logo size="sm" />
+                <Logo size="xl" />
               </div>
               {/* Info icon — desktop only, matches Figma header */}
               <button className="hidden md:flex w-8 h-8 rounded-full bg-sky-500/15 items-center justify-center text-sky-400 hover:bg-sky-500/25 transition-colors flex-shrink-0">
@@ -45,9 +43,9 @@ export default function Header({ title, showBack = false, actions }) {
           )}
         </div>
 
-        {/* Center — clinic logo on desktop */}
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 flex-col items-center">
-          <img src="/Full-Logo.svg" alt="São Camilo" className="h-7 w-auto object-contain" />
+        {/* Center — brand logo on desktop */}
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
+          <img src="/Full-Logo.svg" alt="SweatTrack" className="h-9 w-auto object-contain" />
         </div>
 
         {/* Right */}

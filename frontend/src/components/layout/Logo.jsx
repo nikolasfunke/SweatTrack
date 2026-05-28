@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 export default function Logo({ size = 'md', className = '' }) {
   const [imgFailed, setImgFailed] = useState(false);
   const navigate = useNavigate();
-  const heights = { sm: 'h-7', md: 'h-8', lg: 'h-10', xl: 'h-12' };
+  const heights = { sm: 'h-7', md: 'h-8', lg: 'h-10', xl: 'h-12', '2xl': 'h-28' };
 
   return (
     <motion.div

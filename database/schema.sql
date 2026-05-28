@@ -95,11 +95,10 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- user demo (password: demo1234)
-INSERT IGNORE INTO users (name, email, password_hash, role, clinic_name)
+INSERT IGNORE INTO users (name, email, password_hash, role)
 VALUES (
   'Dr. Silva',
   'demo@sweattrack.com',
   '$2b$10$R.9DM6usOhPhXS3OzMcxL.aZFaz77JI7kMgy4JNOwArimNGapOcHC',
-  'doctor',
-  'São Camilo'
+  'doctor'
 );

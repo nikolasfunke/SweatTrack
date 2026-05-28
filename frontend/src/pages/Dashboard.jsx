@@ -93,12 +93,6 @@ export default function Dashboard() {
                 <h1 className="text-2xl font-black mt-0.5">
                   {greeting}, {displayName}
                 </h1>
-                {user?.clinicName && (
-                  <p className="text-xs text-white/30 mt-0.5 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-slow" />
-                    {user.clinicName}
-                  </p>
-                )}
               </div>
               {/* Button hidden on very small screens, shown on sm+ */}
               <div className="hidden sm:block flex-shrink-0">

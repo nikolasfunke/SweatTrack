@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Building2, Eye, EyeOff, Shield } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import Button from '../components/ui/Button';
@@ -14,7 +14,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirmPassword: '',
-    role: 'athlete', clinicName: '', requestAdmin: false,
+    role: 'athlete', requestAdmin: false,
   });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,6 @@ export default function Register() {
         email: form.email,
         password: form.password,
         role: form.role,
-        clinicName: form.clinicName || undefined,
         requestAdmin: form.role === 'coach' ? form.requestAdmin : undefined,
       });
       toast('Conta criada com sucesso!', 'success');
@@ -111,15 +110,6 @@ export default function Register() {
             icon={<Mail size={16} />}
             error={errors.email}
           />
-          {form.role === 'coach' && (
-            <Input
-              label="Clínica / Instituição"
-              placeholder="Sweat-Track Sports"
-              value={form.clinicName}
-              onChange={set('clinicName')}
-              icon={<Building2 size={16} />}
-            />
-          )}
           {form.role === 'coach' && (
             <button
               type="button"

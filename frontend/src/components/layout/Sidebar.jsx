@@ -30,11 +30,8 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-surface-1 border-r border-border h-screen sticky top-0 flex-shrink-0">
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-border">
-        <Logo />
-        {user?.clinicName && (
-          <p className="text-xs text-white/30 font-medium mt-1 ml-10">{user.clinicName}</p>
-        )}
+      <div className="py-0 border-b border-border flex justify-center">
+        <Logo size="2xl" />
       </div>
 
       {/* Main nav */}
@@ -115,3 +112,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+

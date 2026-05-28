@@ -172,9 +172,6 @@ export default function AdminUsers() {
                     }`}>
                       {ROLE_LABEL[u.role] || u.role}
                     </span>
-                    {u.clinic_name && (
-                      <span className="text-[10px] text-white/30">{u.clinic_name}</span>
-                    )}
                     <span className="text-[10px] text-white/20 ml-auto">{timeAgo(u.created_at)}</span>
                   </div>
                 </div>

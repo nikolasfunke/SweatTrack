@@ -1,274 +1,289 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Droplets, Clock, CheckCircle2, Save, Download,
-  Beaker, Pill, Eye, TrendingDown, Activity, Thermometer,
-} from 'lucide-react';
-import { printSessionReport } from '../utils/imprimirRelatorio';
-import { sessionApi } from '../services/api';
-import LayoutApp from '../components/layout/LayoutApp';
-import Cabecalho from '../components/layout/Cabecalho';
-import Cartao from '../components/ui/Cartao';
-import Botao from '../components/ui/Botao';
-import { useToast } from '../components/ui/Toast';
-import { formatDuration, calcRecoveryFluid, getSweatRateLabel } from '../utils/calculos';
+import React from 'react';
+import logoFull from "../assets/logo_sweatTrack.svg";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
+import PageTransition from "../components/PageTransition";
 
-const stagger = { animate: { transition: { staggerChildren: 0.09 } } };
-const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
+function PosSessao() {
 
-const SESSION_TYPE_LABEL = { training: 'Treino', match: 'Jogo', recovery: 'Recuperação' };
-const INTENSITY_COLOR = { baixa: '#34d399', moderada: '#fbbf24', alta: '#f87171', variada: '#a78bfa' };
+const navigate = useNavigate();
 
-export default function PosSessao() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const toast = useToast();
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saved, setSaved] = useState(false);
+return (
 
-  useEffect(() => {
-    sessionApi.getOne(id)
-      .then((r) => setSession(r.data))
-      .catch(() => toast('Erro ao carregar sessão', 'error'))
-      .finally(() => setLoading(false));
-  }, [id]);
+    <PageTransition>
 
-  const handleSave = () => {
-    setSaved(true);
-    toast('Salvo no prontuário!', 'success');
-  };
+<div className="min-h-screen bg-[#F3F4F6] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
+<Header/>
 
-  if (loading) return (
-    <LayoutApp>
-      <Cabecalho title="Resumo Pós-Sessão" showBack />
-      <div className="flex items-center justify-center min-h-64">
-        <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-primary animate-spin" />
-      </div>
-    </LayoutApp>
-  );
 
-  const deficitMl    = Math.abs(session?.hydric_deficit_ml ?? 0);
-  const sodiumMg     = session?.sodium_loss_mg ?? 0;
-  const duration     = session?.duration_minutes ?? 0;
-  const sweatRate    = session?.sweat_rate_lh ?? 0;
-  const intTemp      = session?.internal_temp ?? null;
-  const sessionType  = SESSION_TYPE_LABEL[session?.session_type] ?? 'Sessão';
-  const intensity    = session?.intensity ?? 'moderada';
-  const intColor     = INTENSITY_COLOR[intensity] ?? '#C41E3A';
-  const sweatLabel   = getSweatRateLabel(sweatRate);
+{/* TITULO */}
+<div className="px-6 pt-6">
 
-  const recoveryHours = deficitMl > 0 ? Math.max(8, Math.round(deficitMl / 200)) : 8;
+<p className="text-[10px] font-black tracking-[0.25em] text-[#C40024] uppercase mb-2">
+Relatório de Performance
+</p>
 
-  const recoverySteps = [
-    {
-      icon: <Droplets size={18} className="text-sky-400" />,
-      title: 'Reidratação Imediata',
-      desc: deficitMl > 0
-        ? `Consuma ${calcRecoveryFluid(deficitMl)}ml de fluidos nas próximas 4 horas (150% da perda total de ${(deficitMl / 1000).toFixed(2)}L).`
-        : 'Mantenha hidratação regular pós-sessão com 500–800ml de fluidos.',
-      color: 'border-sky-500/20 bg-sky-500/5',
-    },
-    {
-      icon: <Pill size={18} className="text-amber-400" />,
-      title: 'Reposição de Eletrólitos',
-      desc: sodiumMg > 0
-        ? `Perda de sódio estimada em ${sodiumMg}mg. ${sodiumMg > 1500 ? 'Sachê eletrolítico isotônico recomendado.' : 'Alimentação normal de reposição é suficiente.'}`
-        : 'Inclua fontes de sódio na alimentação pós-treino.',
-      color: 'border-amber-500/20 bg-amber-500/5',
-    },
-    {
-      icon: <Eye size={18} className="text-violet-400" />,
-      title: 'Monitoramento de Urina',
-      desc: 'Acompanhe a coloração da urina até atingir o tom amarelo-claro (Padrão 1-2 na escala de WUTS).',
-      color: 'border-violet-500/20 bg-violet-500/5',
-    },
-  ];
+<h1 className="text-[44px] leading-[42px] font-black text-[#1A1A1A] tracking-tight">
+Resumo Pós-<br />
+Sessão
+</h1>
 
-  const sessionDate = session?.ended_at
-    ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
-    : null;
+<div className="w-16 h-[4px] bg-[#C40024] rounded-full mt-4" />
 
-  return (
-    <LayoutApp>
-      <Cabecalho title="Resumo Pós-Sessão" showBack />
-      <div className="page-container md:max-w-2xl">
-        <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-5">
+</div>
 
-          {/* Header */}
-          <motion.div variants={fadeUp}>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Relatório de Performance</p>
-            <h1 className="text-2xl font-black mt-1">
-              Resumo<br />Pós-Sessão
-            </h1>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span
-                className="text-[10px] font-black px-2.5 py-1 rounded-full"
-                style={{ background: `${intColor}20`, color: intColor }}
-              >
-                {intensity.toUpperCase()}
-              </span>
-              <span className="text-xs text-white/40">{sessionType}</span>
-              {sessionDate && <span className="text-xs text-white/30">· {sessionDate}</span>}
-            </div>
-          </motion.div>
+{/* CARD PRINCIPAL */}
+<div className="px-6 mt-7">
 
-          {/* Main metrics */}
-          <motion.div variants={fadeUp}>
-            <Cartao glow>
-              <p className="section-title">Taxa de Sudorese</p>
-              <div className="flex items-end gap-2 mb-1">
-                <p className="text-5xl font-black tabular-nums">
-                  {sweatRate > 0 ? sweatRate.toFixed(2) : '—'}
-                </p>
-                {sweatRate > 0 && <p className="text-xl text-white/40 font-bold mb-1">L/h</p>}
-              </div>
-              {sweatRate > 0 && (
-                <p className="text-xs text-white/50 bg-surface-2 rounded-xl px-3 py-2 mb-4">
-                  Classificada como{' '}
-                  <span className={`font-bold ${sweatLabel.color}`}>{sweatLabel.label.toLowerCase()}</span>
-                  {intTemp && ` para as condições registradas (${intTemp}°C).`}
-                  {!intTemp && '.'}
-                </p>
-              )}
+<div className="bg-white rounded-[24px] p-6 relative overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.03)]">
 
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                <div className="bg-surface-2 rounded-xl p-3 text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <TrendingDown size={13} className="text-rose-400" />
-                    <p className="text-xs text-white/40">Perda Total</p>
-                  </div>
-                  <p className="text-xl font-black text-rose-400">
-                    {deficitMl > 0 ? `${(deficitMl / 1000).toFixed(2)}L` : '—'}
-                  </p>
-                </div>
-                <div className="bg-surface-2 rounded-xl p-3 text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <Clock size={13} className="text-white/40" />
-                    <p className="text-xs text-white/40">Duração</p>
-                  </div>
-                  <p className="text-xl font-black">{duration > 0 ? formatDuration(duration) : '—'}</p>
-                </div>
-              </div>
+{/* DETALHE VISUAL */}
+<div className="absolute top-0 right-0 w-28 h-28 bg-[#F8F5F5] rounded-bl-full opacity-80" />
 
-              {/* Extra metrics row */}
-              {(sodiumMg > 0 || intTemp) && (
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  {sodiumMg > 0 && (
-                    <div className="bg-surface-2 rounded-xl p-3 text-center">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <Beaker size={13} className="text-amber-400" />
-                        <p className="text-xs text-white/40">Sódio perdido</p>
-                      </div>
-                      <p className="text-lg font-black text-amber-400">{sodiumMg}mg</p>
-                    </div>
-                  )}
-                  {intTemp && (
-                    <div className="bg-surface-2 rounded-xl p-3 text-center">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <Thermometer size={13} className={intTemp > 38.5 ? 'text-rose-400' : 'text-violet-400'} />
-                        <p className="text-xs text-white/40">Temp. Interna</p>
-                      </div>
-                      <p className={`text-lg font-black ${intTemp > 38.5 ? 'text-rose-400' : 'text-violet-400'}`}>
-                        {intTemp}°C
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </Cartao>
-          </motion.div>
+<div className="absolute top-8 right-8 opacity-20">
 
-          {/* Pre / Post weight */}
-          {(session?.pre_weight_kg || session?.post_weight_kg) && (
-            <motion.div variants={fadeUp}>
-              <Cartao>
-                <p className="section-title">Variação de Peso</p>
-                <div className="flex items-center justify-around py-1">
-                  <div className="text-center">
-                    <p className="text-[10px] text-white/30 mb-1">Pré-treino</p>
-                    <p className="text-2xl font-black">{session.pre_weight_kg ?? '—'}</p>
-                    <p className="text-xs text-white/30">kg</p>
-                  </div>
-                  {session.pre_weight_kg && session.post_weight_kg && (
-                    <div className="text-center">
-                      <p className="text-[10px] text-white/30 mb-1">Variação</p>
-                      <p className="text-2xl font-black text-rose-400">
-                        -{(session.pre_weight_kg - session.post_weight_kg).toFixed(2)}
-                      </p>
-                      <p className="text-xs text-white/30">kg</p>
-                    </div>
-                  )}
-                  <div className="text-center">
-                    <p className="text-[10px] text-white/30 mb-1">Pós-treino</p>
-                    <p className="text-2xl font-black">{session.post_weight_kg ?? '—'}</p>
-                    <p className="text-xs text-white/30">kg</p>
-                  </div>
-                </div>
-              </Cartao>
-            </motion.div>
-          )}
+<svg
+width="52"
+height="52"
+viewBox="0 0 24 24"
+fill="none"
+stroke="#C40024"
+strokeWidth="1.7"
+strokeLinecap="round"
+strokeLinejoin="round"
+>
+<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+</svg>
 
-          {/* Recovery protocol */}
-          <motion.div variants={fadeUp}>
-            <p className="section-title">Protocolo de Recuperação</p>
-            <div className="space-y-3">
-              {recoverySteps.map((step, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  className={`flex items-start gap-3 p-4 rounded-2xl border ${step.color}`}
-                >
-                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-surface-2 font-black text-sm flex-shrink-0 mt-0.5">
-                    {i + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {step.icon}
-                      <p className="font-bold text-sm">{step.title}</p>
-                    </div>
-                    <p className="text-xs text-white/60 leading-relaxed">{step.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+</div>
 
-          {/* Recovery estimate */}
-          <motion.div variants={fadeUp}>
-            <div className="bg-gradient-to-r from-primary/20 to-rose-900/10 border border-primary/20 rounded-2xl p-4">
-              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">
-                Análise Biopsicossocial
-              </p>
-              <p className="font-black text-lg">
-                Sua recuperação levará aprox. <span className="text-gradient">{recoveryHours}h</span>.
-              </p>
-              <p className="text-xs text-white/50 mt-1 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                Baseado no déficit hídrico e intensidade da sessão.
-              </p>
-            </div>
-          </motion.div>
+<p className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-black mb-4 relative z-10">
+Taxa de Sudorese
+</p>
 
-          {/* Actions */}
-          <motion.div variants={fadeUp} className="grid grid-cols-2 gap-3 pb-4">
-            <Botao
-              variant="outline"
-              onClick={() => session && printSessionReport(session)}
-              icon={<Download size={16} />}
-            >
-              Exportar PDF
-            </Botao>
-            <Botao variant="primary" onClick={() => navigate('/painel')}>
-              Voltar ao Dashboard
-            </Botao>
-          </motion.div>
+<div className="flex items-end gap-1 relative z-10">
 
-         </motion.div>
-      </div>
-    </LayoutApp>
-  );
+<h2 className="text-6xl font-black text-[#E3002B] leading-none">
+1.42
+</h2>
+
+<span className="text-2xl font-black text-gray-400 mb-1">
+L/h
+</span>
+
+</div>
+
+<p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-[220px] relative z-10">
+Considerada <span className="text-[#E3002B] font-bold">moderada-alta</span> para as condições atuais (24°C / 65% UR).
+</p>
+
+</div>
+
+</div>
+
+{/* CARDS INFERIORES */}
+<div className="px-6 mt-4 grid grid-cols-2 gap-3">
+
+<div className="bg-[#EFEFF1] rounded-[20px] p-5">
+
+<div className="mb-4">
+
+<svg
+width="18"
+height="18"
+viewBox="0 0 24 24"
+fill="none"
+stroke="#E3002B"
+strokeWidth="2"
+strokeLinecap="round"
+strokeLinejoin="round"
+>
+<path d="M3 6h18"></path>
+<path d="M3 12h18"></path>
+<path d="M3 18h18"></path>
+<path d="M6 3l2 3-2 3"></path>
+<path d="M12 9l2 3-2 3"></path>
+<path d="M18 15l2 3-2 3"></path>
+</svg>
+
+</div>
+
+<p className="text-[9px] uppercase tracking-[0.15em] text-gray-400 font-black mb-2">
+Perda Total
+</p>
+
+<h3 className="text-4xl font-black text-[#222]">
+2.15<span className="text-2xl"> L</span>
+</h3>
+
+</div>
+
+<div className="bg-[#EFEFF1] rounded-[20px] p-5">
+
+<div className="mb-4">
+
+<svg
+width="18"
+height="18"
+viewBox="0 0 24 24"
+fill="none"
+stroke="#E3002B"
+strokeWidth="2"
+strokeLinecap="round"
+strokeLinejoin="round"
+>
+<circle cx="12" cy="13" r="8"></circle>
+<path d="M12 9v4l2 2"></path>
+<path d="M9 2h6"></path>
+</svg>
+
+</div>
+
+<p className="text-[9px] uppercase tracking-[0.15em] text-gray-400 font-black mb-2">
+Duração
+</p>
+
+<h3 className="text-4xl font-black text-[#222]">
+90<span className="text-2xl"> min</span>
+</h3>
+
+</div>
+
+</div>
+
+{/* PROTOCOLO */}
+<div className="px-6 mt-8">
+
+<h2 className="text-2xl font-black text-[#222] mb-6">
+Protocolo de Recuperação
+</h2>
+
+<div className="flex flex-col gap-5">
+
+{/* ITEM 1 */}
+<div className="flex gap-4 items-start">
+
+<div className="w-9 h-9 rounded-xl bg-[#E3002B] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+1
+</div>
+
+<div>
+
+<h3 className="text-[15px] font-black text-[#222] mb-1">
+Reidratação Imediata
+</h3>
+
+<p className="text-sm text-gray-500 leading-relaxed">
+Consumir 3.2L de fluidos nas próximas 4 horas (150% da perda total).
+</p>
+
+</div>
+
+</div>
+
+{/* ITEM 2 */}
+<div className="flex gap-4 items-start">
+
+<div className="w-9 h-9 rounded-xl bg-[#E5E7EB] text-[#E3002B] flex items-center justify-center font-black text-sm shrink-0">
+2
+</div>
+
+<div>
+
+<h3 className="text-[15px] font-black text-[#222] mb-1">
+Reposição de Eletrólitos
+</h3>
+
+<p className="text-sm text-gray-500 leading-relaxed">
+Sua perda de sódio estimada foi de 1.800mg. Recomenda-se sachê eletrolítico isotônico.
+</p>
+
+</div>
+
+</div>
+
+{/* ITEM 3 */}
+<div className="flex gap-4 items-start">
+
+<div className="w-9 h-9 rounded-xl bg-[#E5E7EB] text-[#E3002B] flex items-center justify-center font-black text-sm shrink-0">
+3
+</div>
+
+<div>
+
+<h3 className="text-[15px] font-black text-[#222] mb-1">
+Monitoramento de Urina
+</h3>
+
+<p className="text-sm text-gray-500 leading-relaxed">
+Acompanhe a coloração da urina até atingir o tom amarelo-claro (Padrão 1-2 na escala de VUTS).
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{/* CARD VERMELHO */}
+<div className="px-6 mt-8">
+
+<div className="bg-[#E3002B] rounded-[22px] p-6 text-white shadow-[0_10px_30px_rgba(227,0,43,0.25)]">
+
+<p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80 mb-3">
+Análise Biopsicossocial
+</p>
+
+<h2 className="text-4xl leading-[38px] font-black mb-5">
+Sua recuperação levará aprox. 14 horas.
+</h2>
+
+<div className="flex gap-2 items-start">
+
+<div className="mt-1">
+<svg
+width="14"
+height="14"
+viewBox="0 0 24 24"
+fill="currentColor"
+>
+<circle cx="12" cy="12" r="10"></circle>
+</svg>
+</div>
+
+<p className="text-xs opacity-90 leading-relaxed">
+Baseado em dados de temperatura e intensidade da sessão.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+{/* BOTÃO */}
+<div className="px-6 mt-8">
+
+<button
+onClick={() => navigate("/HistoricoSessoes")}
+className="w-full py-5 rounded-2xl bg-[#E3002B] text-white font-black text-sm tracking-wide shadow-[0_10px_25px_rgba(227,0,43,0.25)] hover:bg-red-700 active:scale-95 transition-all"
+>
+SALVAR NO PRONTUÁRIO
+</button>
+
+</div>
+
+<Navbar active="analises" />
+
+</div>
+
+</PageTransition>
+
+);
+
 }
+
+export default PosSessao;

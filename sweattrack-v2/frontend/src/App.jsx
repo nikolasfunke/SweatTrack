@@ -1,21 +1,21 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/ContextoAutenticacao';
 import { PageLoader } from './components/ui/Spinner';
 
-import Login           from './pages/Login';
-import Register        from './pages/Register';
-import Dashboard       from './pages/Dashboard';
-import PreSession      from './pages/PreSession';
-import ActiveMonitoring from './pages/ActiveMonitoring';
-import PostSession     from './pages/PostSession';
-import Analytics       from './pages/Analytics';
-import MealPlan        from './pages/MealPlan';
-import History         from './pages/History';
-import Monitor         from './pages/Monitor';
-import Notifications   from './pages/Notifications';
-import Profile         from './pages/Profile';
-import Settings        from './pages/Settings';
+import Login              from './pages/Login';
+import Cadastro           from './pages/Cadastro';
+import Painel             from './pages/Painel';
+import PreSessao          from './pages/PreSessao';
+import MonitoramentoAtivo from './pages/MonitoramentoAtivo';
+import PosSessao          from './pages/PosSessao';
+import Analises           from './pages/Analises';
+import PlanoAlimentar     from './pages/PlanoAlimentar';
+import Historico          from './pages/Historico';
+import Monitorar          from './pages/Monitorar';
+import Notificacoes       from './pages/Notificacoes';
+import Perfil             from './pages/Perfil';
+import Configuracoes      from './pages/Configuracoes';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -28,7 +28,7 @@ function RequireAuth({ children }) {
 function RedirectIfAuth({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <PageLoader />;
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) return <Navigate to="/painel" replace />;
   return children;
 }
 
@@ -40,20 +40,20 @@ export default function App() {
         {/* Public */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login"    element={<RedirectIfAuth><Login /></RedirectIfAuth>} />
-        <Route path="/register" element={<RedirectIfAuth><Register /></RedirectIfAuth>} />
+        <Route path="/cadastro" element={<RedirectIfAuth><Cadastro /></RedirectIfAuth>} />
 
         {/* Protected */}
-        <Route path="/dashboard"      element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="/pre-session/:id" element={<RequireAuth><PreSession /></RequireAuth>} />
-        <Route path="/active/:id"      element={<RequireAuth><ActiveMonitoring /></RequireAuth>} />
-        <Route path="/post-session/:id" element={<RequireAuth><PostSession /></RequireAuth>} />
-        <Route path="/monitor"        element={<RequireAuth><Monitor /></RequireAuth>} />
-        <Route path="/analytics"      element={<RequireAuth><Analytics /></RequireAuth>} />
-        <Route path="/meal-plan"      element={<RequireAuth><MealPlan /></RequireAuth>} />
-        <Route path="/history"        element={<RequireAuth><History /></RequireAuth>} />
-        <Route path="/notifications"  element={<RequireAuth><Notifications /></RequireAuth>} />
-        <Route path="/profile"        element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/settings"       element={<RequireAuth><Settings /></RequireAuth>} />
+        <Route path="/painel"           element={<RequireAuth><Painel /></RequireAuth>} />
+        <Route path="/pre-sessao/:id"   element={<RequireAuth><PreSessao /></RequireAuth>} />
+        <Route path="/ativo/:id"        element={<RequireAuth><MonitoramentoAtivo /></RequireAuth>} />
+        <Route path="/pos-sessao/:id"   element={<RequireAuth><PosSessao /></RequireAuth>} />
+        <Route path="/monitorar"        element={<RequireAuth><Monitorar /></RequireAuth>} />
+        <Route path="/analises"         element={<RequireAuth><Analises /></RequireAuth>} />
+        <Route path="/plano-alimentar"  element={<RequireAuth><PlanoAlimentar /></RequireAuth>} />
+        <Route path="/historico"        element={<RequireAuth><Historico /></RequireAuth>} />
+        <Route path="/notificacoes"     element={<RequireAuth><Notificacoes /></RequireAuth>} />
+        <Route path="/perfil"           element={<RequireAuth><Perfil /></RequireAuth>} />
+        <Route path="/configuracoes"    element={<RequireAuth><Configuracoes /></RequireAuth>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -61,3 +61,4 @@ export default function App() {
     </AnimatePresence>
   );
 }
+

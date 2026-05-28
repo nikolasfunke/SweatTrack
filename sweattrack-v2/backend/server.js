@@ -12,11 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (_, res) => res.json({ status: 'ok', ts: new Date() }));
 
 // Routes
-app.use('/api/auth', require('./src/routes/auth'));
-app.use('/api/sessions', require('./src/routes/sessions'));
-app.use('/api/users', require('./src/routes/users'));
-app.use('/api/analytics', require('./src/routes/analytics'));
-app.use('/api/meals', require('./src/routes/meals'));
+app.use('/api/autenticacao', require('./src/routes/autenticacao'));
+app.use('/api/sessoes', require('./src/routes/sessoes'));
+app.use('/api/usuarios', require('./src/routes/usuarios'));
+app.use('/api/analises', require('./src/routes/analises'));
+app.use('/api/refeicoes', require('./src/routes/refeicoes'));
 
 // 404 handler
 app.use((req, res) => res.status(404).json({ error: `Route ${req.path} not found` }));

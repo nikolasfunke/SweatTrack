@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Droplets, Activity, BarChart3, Shield } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/ContextoAutenticacao';
 import { useToast } from '../components/ui/Toast';
-import Button from '../components/ui/Button';
+import Botao from '../components/ui/Botao';
 import Input from '../components/ui/Input';
 
 const FEATURES = [
@@ -32,7 +32,7 @@ export default function Login() {
     try {
       await login(form.email, form.password);
       toast('Bem-vindo de volta!', 'success');
-      navigate('/dashboard');
+      navigate('/painel');
     } catch (err) {
       setError(err.response?.data?.error || 'Credenciais inválidas');
     } finally {
@@ -181,9 +181,9 @@ export default function Login() {
               </motion.p>
             )}
 
-            <Button type="submit" variant="primary" size="xl" loading={loading} className="mt-2">
+            <Botao type="submit" variant="primary" size="xl" loading={loading} className="mt-2">
               Entrar
-            </Button>
+            </Botao>
           </form>
 
           <div className="mt-4">
@@ -199,7 +199,7 @@ export default function Login() {
           <p className="text-center text-sm text-white/40 mt-6">
             Não tem conta?{' '}
             <Link
-              to="/register"
+              to="/cadastro"
               className="text-primary font-semibold hover:text-primary-light transition-colors"
             >
               Cadastrar

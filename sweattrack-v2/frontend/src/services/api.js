@@ -28,44 +28,44 @@ export default api;
 
 // Auth
 export const authApi = {
-  login: (data) => api.post('/auth/login', data),
-  register: (data) => api.post('/auth/register', data),
-  me: () => api.get('/auth/me'),
+  login: (data) => api.post('/autenticacao/login', data),
+  register: (data) => api.post('/autenticacao/registrar', data),
+  me: () => api.get('/autenticacao/eu'),
 };
 
 // Sessions
 export const sessionApi = {
-  list: () => api.get('/sessions'),
-  create: (data) => api.post('/sessions', data),
-  getOne: (id) => api.get(`/sessions/${id}`),
-  updatePre: (id, data) => api.patch(`/sessions/${id}/pre`, data),
-  start: (id) => api.post(`/sessions/${id}/start`),
-  logFluid: (id, data) => api.post(`/sessions/${id}/fluid`, data),
-  updateTemp: (id, data) => api.patch(`/sessions/${id}/temp`, data),
-  finish: (id, data) => api.post(`/sessions/${id}/finish`, data),
-  delete: (id) => api.delete(`/sessions/${id}`),
+  list: () => api.get('/sessoes'),
+  create: (data) => api.post('/sessoes', data),
+  getOne: (id) => api.get(`/sessoes/${id}`),
+  updatePre: (id, data) => api.patch(`/sessoes/${id}/pre`, data),
+  start: (id) => api.post(`/sessoes/${id}/iniciar`),
+  logFluid: (id, data) => api.post(`/sessoes/${id}/liquido`, data),
+  updateTemp: (id, data) => api.patch(`/sessoes/${id}/temperatura`, data),
+  finish: (id, data) => api.post(`/sessoes/${id}/finalizar`, data),
+  delete: (id) => api.delete(`/sessoes/${id}`),
 };
 
 // Analytics
 export const analyticsApi = {
-  dashboard: () => api.get('/analytics/dashboard'),
-  weekly: () => api.get('/analytics/weekly'),
-  hydrationTrend: () => api.get('/analytics/hydration-trend'),
-  sessionsHistory: (limit = 20) => api.get('/analytics/sessions-history', { params: { limit } }),
+  dashboard: () => api.get('/analises/painel'),
+  weekly: () => api.get('/analises/semanal'),
+  hydrationTrend: () => api.get('/analises/tendencia-hidratacao'),
+  sessionsHistory: (limit = 20) => api.get('/analises/historico-sessoes', { params: { limit } }),
 };
 
 // Meals
 export const mealApi = {
-  list: (date) => api.get('/meals', { params: { date } }),
-  getOne: (id) => api.get(`/meals/${id}`),
-  create: (data) => api.post('/meals', data),
-  delete: (id) => api.delete(`/meals/${id}`),
+  list: (date) => api.get('/refeicoes', { params: { date } }),
+  getOne: (id) => api.get(`/refeicoes/${id}`),
+  create: (data) => api.post('/refeicoes', data),
+  delete: (id) => api.delete(`/refeicoes/${id}`),
 };
 
 // Users
 export const userApi = {
-  updateProfile: (data) => api.put('/users/profile', data),
-  changePassword: (data) => api.put('/users/password', data),
-  notifications: () => api.get('/users/notifications'),
-  markRead: (id) => api.patch(`/users/notifications/${id}/read`),
+  updateProfile: (data) => api.put('/usuarios/perfil', data),
+  changePassword: (data) => api.put('/usuarios/senha', data),
+  notifications: () => api.get('/usuarios/notificacoes'),
+  markRead: (id) => api.patch(`/usuarios/notificacoes/${id}/ler`),
 };

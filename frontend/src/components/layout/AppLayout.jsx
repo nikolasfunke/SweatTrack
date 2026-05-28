@@ -26,4 +26,5 @@ export default function AppLayout({ children }) {
       <BottomNav />
     </div>
   );
-}
+} 
+

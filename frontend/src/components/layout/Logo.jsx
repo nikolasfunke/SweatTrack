@@ -15,7 +15,7 @@ export default function Logo({ size = 'md', className = '' }) {
     >
       {!imgFailed ? (
         <img
-          src="/favicon.svg"
+          src="/Half-Logo.png"
           alt="Sweat-Track"
           className={`${heights[size]} w-auto object-contain`}
           onError={() => setImgFailed(true)}

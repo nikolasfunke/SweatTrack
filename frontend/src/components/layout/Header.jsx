@@ -43,11 +43,9 @@ export default function Header({ title, showBack = false, actions }) {
           )}
         </div>
 
-        {/* Center — clinic name on desktop */}
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 flex-col items-center pointer-events-none">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
-            {clinicName.toUpperCase()}
-          </span>
+        {/* Center — clinic logo on desktop */}
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 flex-col items-center">
+          <img src="/Full-Logo.svg" alt="São Camilo" className="h-7 w-auto object-contain" />
         </div>
 
         {/* Right */}

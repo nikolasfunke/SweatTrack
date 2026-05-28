@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const ctrl = require('../controllers/controladorRefeicoes');
-const auth = require('../middleware/autenticacao');
+const ctrl = require('../controllers/mealController');
+const auth = require('../middleware/auth');
 
 router.use(auth);
 router.get('/', ctrl.list);

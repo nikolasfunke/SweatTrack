@@ -27,7 +27,7 @@ const handleAuthError = (res, err, action) => {
   return res.status(500).json({ error: 'Erro interno do servidor' });
 };
 
-// Validation rules
+
 exports.registerRules = [
   body('name').trim().notEmpty().withMessage('Nome obrigatório'),
   body('email').isEmail().normalizeEmail().withMessage('Email inválido'),
@@ -49,7 +49,6 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, clinicName, requestAdmin } = req.body;
 
-    // Never trust role from client; validate it but default to athlete
     let role = req.body.role || 'athlete';
     if (!ALLOWED_ROLES.has(role)) role = 'athlete';
 

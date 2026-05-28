@@ -43,7 +43,7 @@ exports.toggleAdmin = async (req, res) => {
     const newValue = rows[0].is_admin ? 0 : 1;
     await db.query('UPDATE users SET is_admin = ? WHERE id = ?', [newValue, targetId]);
 
-    // Notify the user about the change
+    
     const msg = newValue
       ? 'Seu acesso de administrador foi ativado.'
       : 'Seu acesso de administrador foi removido.';
@@ -61,7 +61,7 @@ exports.toggleAdmin = async (req, res) => {
 
 exports.handleAdminRequest = async (req, res) => {
   const { notificationId } = req.params;
-  const { action } = req.body; // 'approve' | 'deny'
+  const { action } = req.body; 
 
   if (!['approve', 'deny'].includes(action)) {
     return res.status(400).json({ error: 'Ação inválida' });

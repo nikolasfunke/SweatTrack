@@ -41,13 +41,13 @@ exports.getDashboard = async (req, res) => {
       [userId]
     );
 
-    // Hydration index: 100 − (urineColor − 1) × 12, clamped [20, 100]
+    
     const totalSessions = sessionsCount[0].total;
     const hydrationIndex = (totalSessions > 0 && lastHydration[0]?.urine_color)
       ? Math.max(20, Math.min(100, Math.round(100 - (lastHydration[0].urine_color - 1) * 12)))
       : null;
 
-    // Aggregate stats for dashboard cards
+   
     const [stats] = await db.query(
       `SELECT
          AVG(sweat_rate_lh)    AS avg_sweat_rate,
@@ -121,7 +121,7 @@ exports.getSessionsHistory = async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
 
-    // Last N completed sessions with full metrics
+   
     const [sessions] = await db.query(
       `SELECT
          id,
@@ -143,7 +143,7 @@ exports.getSessionsHistory = async (req, res) => {
       [req.userId, limit]
     );
 
-    // Distribution by intensity
+    
     const [byIntensity] = await db.query(
       `SELECT
          intensity,
@@ -157,7 +157,7 @@ exports.getSessionsHistory = async (req, res) => {
       [req.userId]
     );
 
-    // Monthly aggregates (last 6 months) — group key kept in SELECT to satisfy ONLY_FULL_GROUP_BY
+  
     const [monthly] = await db.query(
       `SELECT
          DATE_FORMAT(ended_at, '%Y-%m')         AS month_key,

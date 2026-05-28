@@ -1,6 +1,5 @@
 const db = require('../config/database');
 
-// Calculate sweat rate and hydric deficit
 function calcSweatMetrics({ preWeight, postWeight, fluidIntakeMl, durationMin }) {
   if (!preWeight || !postWeight || !durationMin) return {};
   const weightLossKg = preWeight - postWeight;
@@ -8,7 +7,7 @@ function calcSweatMetrics({ preWeight, postWeight, fluidIntakeMl, durationMin })
   const totalSweatLiters = weightLossKg + fluidIntakeLiters;
   const sweatRateLh = durationMin > 0 ? (totalSweatLiters / (durationMin / 60)) : 0;
   const hydricDeficitMl = Math.round(weightLossKg * 1000);
-  const sodiumLossMg = Math.round(totalSweatLiters * 1150); // ~50 mmol/L × 23 mg/mmol ≈ 1150 mg/L (ABNE 2025)
+  const sodiumLossMg = Math.round(totalSweatLiters * 1150); 
   return {
     sweatRateLh: parseFloat(sweatRateLh.toFixed(2)),
     hydricDeficitMl,
@@ -99,7 +98,7 @@ exports.logFluid = async (req, res) => {
       'INSERT INTO fluid_logs (session_id, amount_ml, drink_type) VALUES (?, ?, ?)',
       [req.params.id, amountMl, drinkType]
     );
-    // Update session total
+    
     await db.query(
       'UPDATE sessions SET total_fluid_intake_ml = total_fluid_intake_ml + ? WHERE id = ?',
       [amountMl, req.params.id]

@@ -1,4 +1,4 @@
-/* Abre uma janela de impressão estilizada para salvar como PDF através do navegador. */
+/* Opens a styled print window that the user can save as PDF via the browser dialog. */
 
 const RED = '#C41E3A';
 const DARK = '#111111';

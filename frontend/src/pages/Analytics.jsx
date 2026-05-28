@@ -35,9 +35,9 @@ function ChartTooltip({ active, payload, label, unit = '' }) {
 
 /* ── Cores por intensidade ────────────────────────────── */
 const INTENSITY_COLOR = {
-  baixa:   '#34d399',
-  moderada:'#fbbf24',
-  alta:    '#f87171',
+  baixa: '#34d399',
+  moderada: '#fbbf24',
+  alta: '#f87171',
   variada: '#a78bfa',
 };
 const INTENSITY_LABEL = { baixa: 'Baixa', moderada: 'Moderada', alta: 'Alta', variada: 'Variada' };
@@ -60,12 +60,12 @@ export default function Analytics() {
   const toast = useToast();
   const { dark } = useTheme();
   const { user } = useAuth();
-  const tickColor  = dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)';
+  const tickColor = dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)';
 
-  const [dashboard, setDashboard]   = useState(null);
-  const [trend, setTrend]           = useState([]);
-  const [history, setHistory]       = useState({ sessions: [], byIntensity: [], monthly: [] });
-  const [loading, setLoading]       = useState(true);
+  const [dashboard, setDashboard] = useState(null);
+  const [trend, setTrend] = useState([]);
+  const [history, setHistory] = useState({ sessions: [], byIntensity: [], monthly: [] });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.allSettled([
@@ -74,55 +74,55 @@ export default function Analytics() {
       analyticsApi.sessionsHistory(20),
     ]).then(([dash, tr, hist]) => {
       if (dash.status === 'fulfilled') setDashboard(dash.value.data);
-      if (tr.status   === 'fulfilled') setTrend(tr.value.data);
+      if (tr.status === 'fulfilled') setTrend(tr.value.data);
       if (hist.status === 'fulfilled') setHistory(hist.value.data);
     }).finally(() => setLoading(false));
   }, []);
 
   const hydrationIndex = dashboard?.hydrationIndex ?? null;
-  const vo2max         = dashboard?.profile?.vo2max ?? null;
-  const stats          = dashboard?.stats ?? {};
-  const totalSessions  = dashboard?.totalSessions ?? 0;
-  const lastSession    = dashboard?.lastSession ?? null;
-  const isVirgin       = !loading && totalSessions === 0;
+  const vo2max = dashboard?.profile?.vo2max ?? null;
+  const stats = dashboard?.stats ?? {};
+  const totalSessions = dashboard?.totalSessions ?? 0;
+  const lastSession = dashboard?.lastSession ?? null;
+  const isVirgin = !loading && totalSessions === 0;
 
   /* ── Trend data: map API keys → chart keys ── */
   const trendData = trend.map((r) => ({
-    day:     r.date ? new Date(r.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—',
-    sweat:   r.avg_sweat    ? parseFloat(parseFloat(r.avg_sweat).toFixed(2))    : 0,
-    deficit: r.avg_deficit  ? Math.round(parseFloat(r.avg_deficit))              : 0,
+    day: r.date ? new Date(r.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—',
+    sweat: r.avg_sweat ? parseFloat(parseFloat(r.avg_sweat).toFixed(2)) : 0,
+    deficit: r.avg_deficit ? Math.round(parseFloat(r.avg_deficit)) : 0,
   }));
 
   /* ── Session history bars (reversed for chronological order) ── */
   const historyData = [...(history.sessions ?? [])].reverse().map((s) => ({
-    label:   s.label ?? '—',
-    sweat:   s.sweat_rate_lh    ? parseFloat(parseFloat(s.sweat_rate_lh).toFixed(2))    : 0,
+    label: s.label ?? '—',
+    sweat: s.sweat_rate_lh ? parseFloat(parseFloat(s.sweat_rate_lh).toFixed(2)) : 0,
     deficit: s.hydric_deficit_ml ? Math.round(s.hydric_deficit_ml) : 0,
-    duration:s.duration_minutes ?? 0,
-    color:   INTENSITY_COLOR[s.intensity] ?? '#C41E3A',
+    duration: s.duration_minutes ?? 0,
+    color: INTENSITY_COLOR[s.intensity] ?? '#C41E3A',
   }));
 
   /* ── Intensity distribution for pie chart ── */
   const pieData = (history.byIntensity ?? []).map((r) => ({
-    name:  INTENSITY_LABEL[r.intensity] ?? r.intensity,
+    name: INTENSITY_LABEL[r.intensity] ?? r.intensity,
     value: parseInt(r.count),
     color: INTENSITY_COLOR[r.intensity] ?? '#C41E3A',
   }));
 
   /* ── Monthly load ── */
   const monthlyData = (history.monthly ?? []).map((r) => ({
-    month:    r.month,
+    month: r.month,
     sessions: parseInt(r.sessions),
-    sweat:    r.avg_sweat ? parseFloat(parseFloat(r.avg_sweat).toFixed(2)) : 0,
-    minutes:  parseInt(r.total_minutes ?? 0),
+    sweat: r.avg_sweat ? parseFloat(parseFloat(r.avg_sweat).toFixed(2)) : 0,
+    minutes: parseInt(r.total_minutes ?? 0),
   }));
 
   /* ── Recovery estimate ── */
-  const deficitMl      = lastSession?.hydric_deficit_ml ?? 0;
-  const recoveryHours  = lastSession ? Math.max(8, Math.round(Math.abs(deficitMl) / 200)) : null;
+  const deficitMl = lastSession?.hydric_deficit_ml ?? 0;
+  const recoveryHours = lastSession ? Math.max(8, Math.round(Math.abs(deficitMl) / 200)) : null;
 
   const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
-  const fadeUp  = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
+  const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
   return (
     <AppLayout>
@@ -273,7 +273,7 @@ export default function Analytics() {
                     </BarChart>
                   </ResponsiveContainer>
                   {/* Legend */}
-                  <div className="flex items-center gap-4 mt-2 flex-wrap">
+                  <div className="flex items-center gap-4 mb-5 flex-wrap">
                     {Object.entries(INTENSITY_COLOR).map(([key, color]) => (
                       <div key={key} className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
@@ -298,7 +298,7 @@ export default function Analytics() {
                     <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
                       <defs>
                         <linearGradient id="sweatGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor="#C41E3A" stopOpacity={0.35} />
+                          <stop offset="5%" stopColor="#C41E3A" stopOpacity={0.35} />
                           <stop offset="95%" stopColor="#C41E3A" stopOpacity={0} />
                         </linearGradient>
                       </defs>
@@ -464,8 +464,8 @@ export default function Analytics() {
                       lastSession.sweat_rate_lh >= 1.5
                         ? `Taxa de ${lastSession.sweat_rate_lh} L/h — considerada alta. Aumente a ingestão hídrica em 20% na próxima sessão.`
                         : lastSession.sweat_rate_lh >= 0.8
-                        ? `Taxa de ${lastSession.sweat_rate_lh} L/h — dentro da faixa moderada. Mantenha o protocolo atual de hidratação.`
-                        : `Taxa de ${lastSession.sweat_rate_lh ?? '—'} L/h — baixa. Verifique intensidade e condições ambientais.`
+                          ? `Taxa de ${lastSession.sweat_rate_lh} L/h — dentro da faixa moderada. Mantenha o protocolo atual de hidratação.`
+                          : `Taxa de ${lastSession.sweat_rate_lh ?? '—'} L/h — baixa. Verifique intensidade e condições ambientais.`
                     }
                   />
                   {/* Deficit note */}
@@ -475,8 +475,8 @@ export default function Analytics() {
                     title="Déficit Hídrico"
                     desc={
                       Math.abs(deficitMl) > 2000
-                        ? `Perda de ${(Math.abs(deficitMl)/1000).toFixed(2)}L — déficit elevado. Reidratação de ${Math.round(Math.abs(deficitMl)*1.5)}ml nas próximas 4 horas.`
-                        : `Perda de ${(Math.abs(deficitMl)/1000).toFixed(2)}L — dentro do aceitável. Reidratação de ${Math.round(Math.abs(deficitMl)*1.5)}ml recomendada.`
+                        ? `Perda de ${(Math.abs(deficitMl) / 1000).toFixed(2)}L — déficit elevado. Reidratação de ${Math.round(Math.abs(deficitMl) * 1.5)}ml nas próximas 4 horas.`
+                        : `Perda de ${(Math.abs(deficitMl) / 1000).toFixed(2)}L — dentro do aceitável. Reidratação de ${Math.round(Math.abs(deficitMl) * 1.5)}ml recomendada.`
                     }
                   />
                   {/* Sodium note */}

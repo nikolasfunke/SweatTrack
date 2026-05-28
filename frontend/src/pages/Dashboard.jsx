@@ -1,243 +1,405 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import logoFull from "../assets/logo_sweatTrack.svg";
-import Navbar from "../components/Navbar";
-import Header from "../components/Header";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  Plus, Thermometer, Zap, Droplets, ChevronRight,
+  FileText, History, TrendingUp, AlertCircle,
+} from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { analyticsApi, sessionApi } from '../services/api';
+import AppLayout from '../components/layout/AppLayout';
+import Header from '../components/layout/Header';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Badge from '../components/ui/Badge';
+import HydrationGauge from '../components/charts/HydrationGauge';
+import WeeklyChart from '../components/charts/WeeklyChart';
+import SessionCard from '../components/session/SessionCard';
+import SessionDetailModal from '../components/session/SessionDetailModal';
+import Modal from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
+import { getSweatRateLabel } from '../utils/calculations';
+import { isMobileViewport } from '../utils/device';
 
-// ── small SVG icons ──────────────────────────────────────────────
-const PlusCircleIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="8" x2="12" y2="16" />
-    <line x1="8" y1="12" x2="16" y2="12" />
-  </svg>
-);
+const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
+const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
+export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [analytics, setAnalytics] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [sessionsLoaded, setSessionsLoaded] = useState(false);
+  const [showNewSession, setShowNewSession] = useState(false);
+  const [sessionForm, setSessionForm] = useState({ sessionType: 'training', intensity: 'moderada' });
+  const [creating, setCreating] = useState(false);
+  const [detailSession, setDetailSession] = useState(null);
 
+  useEffect(() => {
+    analyticsApi.dashboard().then((r) => setAnalytics(r.data)).catch(() => {});
+    sessionApi.list()
+      .then((r) => setSessions(r.data))
+      .catch(() => {})
+      .finally(() => setSessionsLoaded(true));
+  }, []);
 
-const FileIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-    <line x1="9" y1="13" x2="15" y2="13" />
-    <line x1="9" y1="17" x2="15" y2="17" />
-  </svg>
-);
+  const last = analytics?.lastSession;
+  const sweatLabel = getSweatRateLabel(last?.sweat_rate_lh);
+  const hydrationIndex = analytics?.hydrationIndex ?? null;
+  const isVirgin = sessionsLoaded && sessions.length === 0;
 
-const ClipboardIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
-    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-  </svg>
-);
+  const handleCreateSession = async () => {
+    setCreating(true);
+    try {
+      const { data } = await sessionApi.create(sessionForm);
+      toast('Sessão criada!', 'success');
+      setShowNewSession(false);
+      navigate(`/pre-session/${data.id}`);
+    } catch {
+      toast('Erro ao criar sessão', 'error');
+    } finally {
+      setCreating(false);
+    }
+  };
 
-const RunnerIcon = ({ color = "#c0392b" }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="13" cy="4" r="2" />
-    <path d="M7 21l3-6 3 3 2-8" />
-    <path d="M17 21l-2-4" />
-    <path d="M6 12l2-3 4 1 2-3" />
-  </svg>
-);
+  const openCompletedSession = (session) => {
+    if (isMobileViewport()) {
+      navigate(`/post-session/${session.id}`);
+      return;
+    }
 
-// ── Hydration Ring ───────────────────────────────────────────────
-function HydrationRing({ percent = 82 }) {
-  const r = 54;
-  const circ = 2 * Math.PI * r;
-  const offset = circ * (1 - percent / 100);
+    setDetailSession(session);
+  };
 
-
+  // Show first two words so "Dr. Silva" renders fully instead of just "Dr."
+  const displayName = user?.name?.split(' ').slice(0, 2).join(' ') || 'Atleta';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
 
   return (
-    <div className="flex items-center justify-center my-4">
-      <svg width="140" height="140" viewBox="0 0 140 140">
-        {/* track */}
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
-        {/* progress */}
-        <circle
-          cx="70" cy="70" r={r}
-          fill="none"
-          stroke="#c0392b"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={circ}
-          strokeDashoffset={offset}
-          transform="rotate(-90 70 70)"
-          style={{ transition: "stroke-dashoffset 1s ease" }}
-        />
-        <text x="70" y="67" textAnchor="middle" fontSize="22" fontWeight="700" fill="#111827">{percent}%</text>
-        <text x="70" y="83" textAnchor="middle" fontSize="9" fill="#6b7280" letterSpacing="1">NÍVEL HÍDRICO</text>
-      </svg>
+    <AppLayout>
+      <Header />
+      <div className="page-container md:max-w-4xl">
+        <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-5">
+
+          {/* Greeting */}
+          <motion.div variants={fadeUp} className="pt-2">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-white/40 font-bold uppercase tracking-widest">
+                  Dashboard de Performance
+                </p>
+                <h1 className="text-2xl font-black mt-0.5">
+                  {greeting}, {displayName}
+                </h1>
+                {user?.clinicName && (
+                  <p className="text-xs text-white/30 mt-0.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-slow" />
+                    {user.clinicName}
+                  </p>
+                )}
+              </div>
+              {/* Button hidden on very small screens, shown on sm+ */}
+              <div className="hidden sm:block flex-shrink-0">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setShowNewSession(true)}
+                  icon={<Plus size={16} />}
+                >
+                  Nova Sessão
+                </Button>
+              </div>
+            </div>
+            {/* Full-width button on mobile */}
+            <div className="sm:hidden mt-3">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setShowNewSession(true)}
+                icon={<Plus size={16} />}
+                className="w-full"
+              >
+                Nova Sessão
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* Virgin onboarding banner */}
+          {isVirgin && (
+            <motion.div variants={fadeUp}>
+              <div className="bg-gradient-to-r from-primary/15 to-rose-900/5 border border-primary/30 rounded-2xl p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Zap size={22} className="text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-sm mb-1">Bem-vindo ao SweatTrack!</p>
+                    <p className="text-xs text-white/50 leading-relaxed mb-3">
+                      Crie sua primeira sessão de monitoramento para visualizar métricas reais de
+                      hidratação, taxa de suor e performance atlética.
+                    </p>
+                    <button
+                      onClick={() => setShowNewSession(true)}
+                      className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:opacity-80 transition-opacity"
+                    >
+                      <Plus size={13} /> Criar primeira sessão
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Hydration card */}
+          <motion.div variants={fadeUp}>
+            <Card glow className="relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+              <div className="flex items-center justify-between mb-1">
+                <div>
+                  <p className="section-title mb-0">Status de Hidratação</p>
+                  <p className="text-[10px] text-white/30 mt-0.5">Monitoramento biométrico em tempo real.</p>
+                </div>
+                {hydrationIndex !== null && <Badge variant="otimo">ÓTIMO</Badge>}
+              </div>
+              <div className="flex items-center gap-6 mt-3">
+                {hydrationIndex !== null ? (
+                  <HydrationGauge value={hydrationIndex} size={140} />
+                ) : (
+                  <div className="w-[140px] h-[140px] flex items-center justify-center flex-shrink-0">
+                    <div className="text-center">
+                      <Droplets size={32} className="text-white/20 mx-auto mb-1" />
+                      <p className="text-[10px] text-white/30">Sem dados</p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex-1 space-y-3">
+                  <StatRow
+                    icon={<Zap size={14} className="text-amber-400" />}
+                    label="Taxa de Suor"
+                    value={last?.sweat_rate_lh ? `${last.sweat_rate_lh} L/h` : '—'}
+                    sub={last?.sweat_rate_lh ? sweatLabel.label : undefined}
+                    subColor={sweatLabel.color}
+                  />
+                  <StatRow
+                    icon={<Droplets size={14} className="text-sky-400" />}
+                    label="Sódio"
+                    value={last?.sodium_loss_mg ? `${last.sodium_loss_mg} mg/L` : '—'}
+                  />
+                  <StatRow
+                    icon={<Thermometer size={14} className="text-rose-400" />}
+                    label="Temperatura"
+                    value={last?.internal_temp ? `${last.internal_temp}°C` : '—'}
+                    sub={last?.internal_temp ? (last.internal_temp > 38.5 ? 'ALERTA' : 'Normal') : undefined}
+                    subColor={last?.internal_temp > 38.5 ? 'text-rose-400' : 'text-emerald-400'}
+                  />
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* SweatTrack promo */}
+          <motion.div variants={fadeUp}>
+            <div className="bg-gradient-to-r from-primary/20 to-rose-900/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <TrendingUp size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.15em]">Sweat-Track</p>
+                <p className="text-xs text-white/60 mt-0.5">
+                  Tecnologia clínica para análise termoregulatória de alta precisão.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick access */}
+          <motion.div variants={fadeUp}>
+            <p className="section-title">Acesso Rápido</p>
+            <div className="grid grid-cols-2 gap-3">
+              <QuickCard
+                icon={<FileText size={16} className="text-sky-400" />}
+                label="Relatórios Exportáveis"
+                onClick={() => navigate('/analytics')}
+              />
+              <QuickCard
+                icon={<History size={16} className="text-violet-400" />}
+                label="Histórico de Testes"
+                onClick={() => navigate('/history')}
+              />
+            </div>
+          </motion.div>
+
+          {/* Weekly chart */}
+          <motion.div variants={fadeUp}>
+            <Card>
+              <div className="flex items-center justify-between mb-3">
+                <p className="section-title mb-0">Tendência Semanal</p>
+                {!isVirgin && (
+                  <button
+                    onClick={() => navigate('/analytics')}
+                    className="text-xs text-primary font-semibold flex items-center gap-1 hover:opacity-80"
+                  >
+                    Ver tudo <ChevronRight size={12} />
+                  </button>
+                )}
+              </div>
+              {isVirgin ? (
+                <div className="h-28 flex items-center justify-center">
+                  <p className="text-xs text-white/25 text-center max-w-[180px]">
+                    A carga metabólica semanal aparece após sua primeira sessão
+                  </p>
+                </div>
+              ) : (
+                <WeeklyChart weeklyData={analytics?.weeklyData} />
+              )}
+            </Card>
+          </motion.div>
+
+          {/* Recent sessions */}
+          <motion.div variants={fadeUp}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="section-title mb-0">Sessões Recentes</p>
+              <button
+                onClick={() => navigate('/history')}
+                className="text-xs text-primary font-semibold flex items-center gap-1 hover:opacity-80"
+              >
+                Ver todas <ChevronRight size={12} />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {sessions.length === 0 ? (
+                <EmptyState onNew={() => setShowNewSession(true)} />
+              ) : (
+                sessions.slice(0, 5).map((s) => (
+                  <SessionCard
+                    key={s.id}
+                    session={s}
+                    onClick={() =>
+                      s.status === 'completed'
+                        ? openCompletedSession(s)
+                        : navigate(`/pre-session/${s.id}`)
+                    }
+                  />
+                ))
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Session detail modal */}
+      <SessionDetailModal
+        session={detailSession}
+        open={!!detailSession}
+        onClose={() => setDetailSession(null)}
+      />
+
+      {/* New session modal */}
+      <Modal open={showNewSession} onClose={() => setShowNewSession(false)} title="Nova Sessão">
+        <div className="space-y-4">
+          <div>
+            <label className="label">Tipo de Sessão</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { val: 'training', label: 'Treino',  emoji: '🏋️' },
+                { val: 'match',    label: 'Jogo',    emoji: '⚽' },
+                { val: 'recovery', label: 'Recup.',  emoji: '🧘' },
+              ].map(({ val, label, emoji }) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setSessionForm((f) => ({ ...f, sessionType: val }))}
+                  className={`p-3 rounded-xl border text-sm font-semibold transition-all ${
+                    sessionForm.sessionType === val
+                      ? 'bg-primary/15 border-primary/40 text-white'
+                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                  }`}
+                >
+                  <div className="text-xl mb-1">{emoji}</div>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="label">Intensidade</label>
+            <div className="grid grid-cols-4 gap-2">
+              {['baixa', 'moderada', 'alta', 'variada'].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setSessionForm((f) => ({ ...f, intensity: v }))}
+                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${
+                    sessionForm.intensity === v
+                      ? 'bg-primary/15 border-primary/40 text-white'
+                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Button variant="primary" size="xl" loading={creating} onClick={handleCreateSession}>
+            Criar Sessão
+          </Button>
+        </div>
+      </Modal>
+    </AppLayout>
+  );
+}
+
+function StatRow({ icon, label, value, sub, subColor }) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="text-xs text-white/40">{label}</span>
+      </div>
+      <div className="text-right">
+        <span className="text-sm font-bold">{value}</span>
+        {sub && <p className={`text-[10px] font-bold ${subColor || 'text-white/40'}`}>{sub}</p>}
+      </div>
     </div>
   );
 }
 
-// ── Session card ─────────────────────────────────────────────────
-function SessionCard({ icon, title, date, duration, intensity, intensityColor }) {
+function QuickCard({ icon, label, onClick }) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      className="flex items-start gap-3 py-4 border-b border-gray-100 last:border-0"
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={onClick}
+      className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-2 border border-border hover:border-border-bright text-left transition-colors w-full"
     >
-      <div className="mt-1 p-2 bg-red-50 rounded-xl">
+      <div className="w-8 h-8 rounded-lg bg-surface-3 flex items-center justify-center flex-shrink-0">
         {icon}
       </div>
-      <div className="flex-1">
-        <p className="text-sm font-semibold text-gray-800">{title}</p>
-        <p className="text-xs text-gray-400 mt-0.5">{date}</p>
-        <div className="flex gap-4 mt-1">
-          <span className="text-xs text-gray-500">Duração: <span className="font-medium text-gray-700">{duration}</span></span>
-          <span className="text-xs text-gray-500">Intensidade: <span className="font-semibold" style={{ color: intensityColor }}>{intensity}</span></span>
-        </div>
-      </div>
-    </motion.div>
+      <span className="text-xs font-semibold text-white/70">{label}</span>
+      <ChevronRight size={12} className="text-white/20 ml-auto" />
+    </motion.button>
   );
 }
 
-// ── Main Component ───────────────────────────────────────────────
-function Dashboard() {
-  const navigate = useNavigate();
-  const sessions = [
-    {
-      icon: <RunnerIcon color="#c0392b" />,
-      title: "Atleta Pro: R. Alves",
-      date: "hoje, às 08:47",
-      duration: "45 min",
-      intensity: "ALTA",
-      intensityColor: "#c0392b",
-    },
-    {
-      icon: <RunnerIcon color="#e67e22" />,
-      title: "Atleta: M. Santos",
-      date: "Ontem, às 16:20",
-      duration: "1h 15 min",
-      intensity: "MODERADA",
-      intensityColor: "#e67e22",
-    },
-    {
-      icon: <RunnerIcon color="#7c3aed" />,
-      title: "Pacientes: Clínica 4",
-      date: "Ontem, às 14:00",
-      duration: "2h 30 min",
-      intensity: "VARIADA",
-      intensityColor: "#7c3aed",
-    },
-  ];
-
+function EmptyState({ onNew }) {
   return (
-    <div className="min-h-screen bg-[#F8F9FA] font-sans pb-24 max-w-md mx-auto relative shadow-2xl">
-
-      <Header/>
-
-      {/* ── Content ── */}
-      <div className="px-6 pt-8 pb-6 flex flex-col gap-4">
-
-        {/* ── Hero greeting ── */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <p className="text-[10px] text-[#DA0027] font-bold tracking-widest mb-1 uppercase">Dashboard de Performance</p>
-          <h1 className="text-3xl font-black leading-tight text-gray-900">Olá, Dr. Silva</h1>
-          <p className="text-xs text-gray-500 mt-3 font-medium leading-relaxed pr-8">O status clínico dos seus pacientes está estável.</p>
-
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            whileHover={{ scale: 1.03 }}
-            className="mt-5 flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#DA0027] text-white text-sm font-bold tracking-wide shadow-[0_8px_20px_rgba(218,0,39,0.3)] hover:bg-red-700 active:scale-95 transition-all"
-            onClick={() => navigate("/PreSessao")}
-          >
-           
-            <PlusCircleIcon />
-            NOVA SESSÃO
-          </motion.button>
-        </motion.div>
-
-        {/* ── Hydration card ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-white rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)]"
-        >
-          <div className="flex items-start justify-between mb-1">
-            <div>
-              <p className="text-sm font-bold text-gray-800">Status de Hidratação</p>
-              <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Monitoramento biométrico em tempo real</p>
-            </div>
-            <span className="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">ÓTIMO</span>
-          </div>
-
-          <HydrationRing percent={82} />
-
-          {/* Stats grid */}
-          <div className="grid grid-cols-2 gap-2 mt-1">
-            {[
-              { label: "TAXA DE SUOR", value: "1.2 L/h" },
-              { label: "SÓDIO", value: "850 mg/L" },
-              { label: "TEMPERATURA", value: "37.2 ºC" },
-              { label: "ALERTA", value: "Normal", valueClass: "text-green-600 font-black" },
-            ].map((s, i) => (
-              <div key={i} className="bg-[#F2F4F7] rounded-xl px-3 py-2">
-                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-1">{s.label}</p>
-                <p className={`text-sm font-black text-[#5C6672] ${s.valueClass || ""}`}>{s.value}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── Brand banner ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-          className="rounded-[20px] bg-[#DA0027] p-5 flex items-center gap-3 shadow-[0_8px_20px_rgba(218,0,39,0.3)]"
-        >
-          <img src={logoFull} alt="SweatTrack" className="h-8 brightness-0 invert opacity-90" />
-          <div>
-            <p className="text-[10px] font-black text-white tracking-widest uppercase">Sweat-Track</p>
-            <p className="text-xs text-red-100 mt-1 font-medium leading-relaxed">Tecnologia proprietária São Camilo para análise termoregulatória de alta precisão.</p>
-          </div>
-        </motion.div>
-
-        {/* ── Quick access ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}
-          className="bg-[#F2F4F7] rounded-[20px] overflow-hidden"
-        >
-          <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest px-5 pt-4 pb-2">Acesso Rápido</p>
-          {[
-            { icon: <FileIcon />, label: "Relatórios Exportáveis" },
-            { icon: <ClipboardIcon />, label: "Histórico de Testes" },
-          ].map((item, i) => (
-            <motion.button
-              key={i}
-              whileHover={{ backgroundColor: "#e8eaed" }}
-              className="w-full flex items-center gap-3 px-5 py-3.5 border-t border-black/5 text-sm font-bold text-gray-800 transition text-left"
-            >
-              {item.icon}
-              {item.label}
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {/* ── Recent sessions ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-black text-gray-900">Sessões Recentes</h2>
-            <button className="text-[10px] font-bold text-[#DA0027] uppercase tracking-wider hover:underline transition">Ver todas</button>
-          </div>
-
-          <div className="bg-white rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] px-4">
-            {sessions.map((s, i) => (
-              <SessionCard key={i} {...s} />
-            ))}
-          </div>
-        </motion.div>
-
+    <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center">
+        <AlertCircle size={26} className="text-white/20" />
       </div>
-
-      <Navbar active="inicio" />
-      
-
+      <div>
+        <p className="text-sm font-semibold text-white/60">Nenhuma sessão registrada</p>
+        <p className="text-xs text-white/30 mt-1 max-w-[220px] mx-auto leading-relaxed">
+          Registre seu primeiro treino para acompanhar hidratação e desempenho em tempo real.
+        </p>
+      </div>
+      <Button variant="primary" size="sm" onClick={onNew} icon={<Plus size={14} />}>
+        Criar primeira sessão
+      </Button>
     </div>
   );
 }
-
-export default Dashboard;

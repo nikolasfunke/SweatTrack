@@ -13,7 +13,7 @@ export function PageLoader() {
       <div className="relative">
         <div className="w-16 h-16 rounded-full border-2 border-surface-3 border-t-primary animate-spin" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-black text-gradient">S</span>
+          <img src="/Half-Logo.png" alt="Sweat-Track" className="w-10 h-auto" />
         </div>
       </div>
       <p className="text-white/40 text-sm font-medium animate-pulse">Carregando...</p>

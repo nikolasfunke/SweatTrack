@@ -3,11 +3,11 @@ const db = require('../config/database');
 // Calculate sweat rate and hydric deficit
 function calcSweatMetrics({ preWeight, postWeight, fluidIntakeMl, durationMin }) {
   if (!preWeight || !postWeight || !durationMin) return {};
-  const weightLoss = preWeight - postWeight;
+  const weightLossKg = preWeight - postWeight;
   const fluidIntakeLiters = (fluidIntakeMl || 0) / 1000;
-  const totalSweatLiters = weightLoss + fluidIntakeLiters;
+  const totalSweatLiters = weightLossKg + fluidIntakeLiters;
   const sweatRateLh = durationMin > 0 ? (totalSweatLiters / (durationMin / 60)) : 0;
-  const hydricDeficitMl = Math.round(weightLoss * 1000);
+  const hydricDeficitMl = Math.round(weightLossKg * 1000);
   const sodiumLossMg = Math.round(totalSweatLiters * 1150); // ~50 mmol/L × 23 mg/mmol ≈ 1150 mg/L (ABNE 2025)
   return {
     sweatRateLh: parseFloat(sweatRateLh.toFixed(2)),
@@ -125,7 +125,10 @@ exports.updateTemp = async (req, res) => {
 
 exports.finish = async (req, res) => {
   try {
-    const { postWeightKg, durationMinutes } = req.body;
+    const { postWeightKg, durationMinutes, internalTemp, ambientTemp } = req.body;
+    const normalizedPostWeight = postWeightKg === null || postWeightKg === undefined || postWeightKg === ''
+      ? null
+      : parseFloat(postWeightKg);
     const [sess] = await db.query(
       'SELECT pre_weight_kg, total_fluid_intake_ml FROM sessions WHERE id = ? AND user_id = ?',
       [req.params.id, req.userId]
@@ -135,7 +138,7 @@ exports.finish = async (req, res) => {
     const s = sess[0];
     const metrics = calcSweatMetrics({
       preWeight: s.pre_weight_kg,
-      postWeight: postWeightKg,
+      postWeight: normalizedPostWeight,
       fluidIntakeMl: s.total_fluid_intake_ml,
       durationMin: durationMinutes,
     });
@@ -143,11 +146,14 @@ exports.finish = async (req, res) => {
     await db.query(
       `UPDATE sessions SET status = "completed", ended_at = NOW(),
        post_weight_kg = ?, duration_minutes = ?,
-       sweat_rate_lh = ?, hydric_deficit_ml = ?, sodium_loss_mg = ?
+       sweat_rate_lh = ?, hydric_deficit_ml = ?, sodium_loss_mg = ?,
+       internal_temp = COALESCE(?, internal_temp),
+       ambient_temp = COALESCE(?, ambient_temp)
        WHERE id = ? AND user_id = ?`,
       [
-        postWeightKg, durationMinutes,
-        metrics.sweatRateLh, metrics.hydricDeficitMl, metrics.sodiumLossMg,
+        normalizedPostWeight, durationMinutes,
+        metrics.sweatRateLh ?? null, metrics.hydricDeficitMl ?? null, metrics.sodiumLossMg ?? null,
+        internalTemp || null, ambientTemp || null,
         req.params.id, req.userId,
       ]
     );

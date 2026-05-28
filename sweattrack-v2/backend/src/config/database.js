@@ -14,10 +14,13 @@ const pool = mysql.createPool({
 });
 
 pool.getConnection()
-  .then(conn => { console.log('✅ MySQL connected'); conn.release(); })
+  .then(conn => { 
+    console.log(`✅ MySQL connected to ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306}`); 
+    conn.release(); 
+  })
   .catch(err => {
     console.error(
-      '❌ MySQL connection failed:',
+      `❌ MySQL connection to ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306} failed:`,
       err.code || 'UNKNOWN',
       err.message || 'No error message returned by driver'
     );

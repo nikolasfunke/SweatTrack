@@ -31,6 +31,7 @@ app.use('/api/sessions',  require('./src/routes/sessions'));
 app.use('/api/users',     require('./src/routes/users'));
 app.use('/api/analytics', require('./src/routes/analytics'));
 app.use('/api/admin',     require('./src/routes/admin'));
+app.use('/api/teams',     require('./src/routes/teams'));
 
 
 app.use((req, res) => res.status(404).json({ error: `Route ${req.path} not found` }));

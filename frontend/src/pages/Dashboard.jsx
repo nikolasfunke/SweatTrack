@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Plus, Thermometer, Zap, Droplets, ChevronRight,
-  FileText, History, TrendingUp, AlertCircle,
+  FileText, History, TrendingUp, AlertCircle, ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { analyticsApi, sessionApi } from '../services/api';
@@ -25,9 +25,10 @@ const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const targetUserId = searchParams.get('userId');
   const navigate = useNavigate();
-  const toast = useToast();
+
   const [analytics, setAnalytics] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
@@ -37,12 +38,15 @@ export default function Dashboard() {
   const [detailSession, setDetailSession] = useState(null);
 
   useEffect(() => {
-    analyticsApi.dashboard().then((r) => setAnalytics(r.data)).catch(() => {});
-    sessionApi.list()
+    analyticsApi.dashboard(targetUserId).then((r) => setAnalytics(r.data)).catch(() => { });
+    sessionApi.list(targetUserId)
       .then((r) => setSessions(r.data))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setSessionsLoaded(true));
-  }, []);
+  }, [targetUserId]);
+
+  const { user } = useAuth();
+  const toast = useToast();
 
   const last = analytics?.lastSession;
   const sweatLabel = getSweatRateLabel(last?.sweat_rate_lh);
@@ -65,7 +69,7 @@ export default function Dashboard() {
 
   const openCompletedSession = (session) => {
     if (isMobileViewport()) {
-      navigate(`/post-session/${session.id}`);
+      navigate(`/post-session/${session.id}${targetUserId ? `?userId=${targetUserId}` : ''}`);
       return;
     }
 
@@ -73,7 +77,9 @@ export default function Dashboard() {
   };
 
   // Show first two words so "Dr. Silva" renders fully instead of just "Dr."
-  const displayName = user?.name?.split(' ').slice(0, 2).join(' ') || 'Atleta';
+  const displayName = targetUserId
+    ? (analytics?.athleteName?.split(' ').slice(0, 2).join(' ') || 'Atleta')
+    : (user?.name?.split(' ').slice(0, 2).join(' ') || 'Atleta');
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
 
@@ -81,6 +87,24 @@ export default function Dashboard() {
     <AppLayout>
       <Header />
       <div className="page-container md:max-w-4xl">
+        {targetUserId && (
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="w-8 h-8 rounded-lg bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-white/70 transition-colors"
+                title="Voltar"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Visualizando Atleta</p>
+                <p className="text-sm font-bold text-white mt-0.5">{analytics?.athleteName || 'Carregando...'}</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-semibold bg-white/5 text-white/50 px-2 py-1 rounded-md uppercase">Modo Leitura</span>
+          </div>
+        )}
         <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-5">
 
           {/* Greeting */}
@@ -95,33 +119,37 @@ export default function Dashboard() {
                 </h1>
               </div>
               {/* Button hidden on very small screens, shown on sm+ */}
-              <div className="hidden sm:block flex-shrink-0">
+              {!targetUserId && (
+                <div className="hidden sm:block flex-shrink-0">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setShowNewSession(true)}
+                    icon={<Plus size={16} />}
+                  >
+                    Nova Sessão
+                  </Button>
+                </div>
+              )}
+            </div>
+            {/* Full-width button on mobile */}
+            {!targetUserId && (
+              <div className="sm:hidden mt-3">
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={() => setShowNewSession(true)}
                   icon={<Plus size={16} />}
+                  className="w-full"
                 >
                   Nova Sessão
                 </Button>
               </div>
-            </div>
-            {/* Full-width button on mobile */}
-            <div className="sm:hidden mt-3">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setShowNewSession(true)}
-                icon={<Plus size={16} />}
-                className="w-full"
-              >
-                Nova Sessão
-              </Button>
-            </div>
+            )}
           </motion.div>
 
           {/* Virgin onboarding banner */}
-          {isVirgin && (
+          {isVirgin && !targetUserId && (
             <motion.div variants={fadeUp}>
               <div className="bg-gradient-to-r from-primary/15 to-rose-900/5 border border-primary/30 rounded-2xl p-5">
                 <div className="flex items-start gap-4">
@@ -210,12 +238,12 @@ export default function Dashboard() {
               <QuickCard
                 icon={<FileText size={16} className="text-sky-400" />}
                 label="Relatórios Exportáveis"
-                onClick={() => navigate('/analytics')}
+                onClick={() => navigate(`/analytics${targetUserId ? `?userId=${targetUserId}` : ''}`)}
               />
               <QuickCard
                 icon={<History size={16} className="text-violet-400" />}
                 label="Histórico de Testes"
-                onClick={() => navigate('/history')}
+                onClick={() => navigate(`/history${targetUserId ? `?userId=${targetUserId}` : ''}`)}
               />
             </div>
           </motion.div>
@@ -268,7 +296,7 @@ export default function Dashboard() {
                     onClick={() =>
                       s.status === 'completed'
                         ? openCompletedSession(s)
-                        : navigate(`/pre-session/${s.id}`)
+                        : (!targetUserId && navigate(`/pre-session/${s.id}`))
                     }
                   />
                 ))
@@ -285,8 +313,8 @@ export default function Dashboard() {
         onClose={() => setDetailSession(null)}
         onDeleted={() => {
           setDetailSession(null);
-          analyticsApi.dashboard().then((r) => setAnalytics(r.data)).catch(() => {});
-          sessionApi.list().then((r) => setSessions(r.data)).catch(() => {});
+          analyticsApi.dashboard().then((r) => setAnalytics(r.data)).catch(() => { });
+          sessionApi.list().then((r) => setSessions(r.data)).catch(() => { });
         }}
       />
 
@@ -297,19 +325,18 @@ export default function Dashboard() {
             <label className="label">Tipo de Sessão</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { val: 'training', label: 'Treino',  emoji: '🏋️' },
-                { val: 'match',    label: 'Jogo',    emoji: '⚽' },
-                { val: 'recovery', label: 'Recup.',  emoji: '🧘' },
+                { val: 'training', label: 'Treino', emoji: '🏋️' },
+                { val: 'match', label: 'Jogo', emoji: '⚽' },
+                { val: 'recovery', label: 'Recup.', emoji: '🧘' },
               ].map(({ val, label, emoji }) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => setSessionForm((f) => ({ ...f, sessionType: val }))}
-                  className={`p-3 rounded-xl border text-sm font-semibold transition-all ${
-                    sessionForm.sessionType === val
+                  className={`p-3 rounded-xl border text-sm font-semibold transition-all ${sessionForm.sessionType === val
                       ? 'bg-primary/15 border-primary/40 text-white'
                       : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
-                  }`}
+                    }`}
                 >
                   <div className="text-xl mb-1">{emoji}</div>
                   {label}
@@ -326,11 +353,10 @@ export default function Dashboard() {
                   key={v}
                   type="button"
                   onClick={() => setSessionForm((f) => ({ ...f, intensity: v }))}
-                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${
-                    sessionForm.intensity === v
+                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${sessionForm.intensity === v
                       ? 'bg-primary/15 border-primary/40 text-white'
                       : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
-                  }`}
+                    }`}
                 >
                   {v}
                 </button>

@@ -12,6 +12,7 @@ const NAV = [
   { to: '/monitor',    label: 'Monitorar',       icon: Activity },
   { to: '/analytics',  label: 'Análises',        icon: BarChart3 },
   { to: '/history',    label: 'Histórico',       icon: History },
+  { to: '/teams',      label: 'Equipes',         icon: Users },
 ];
 
 const BOTTOM_NAV = [

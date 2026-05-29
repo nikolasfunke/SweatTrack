@@ -2,7 +2,7 @@ const db = require('../config/database');
 
 exports.getDashboard = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.targetUserId;
 
     const [sessionsCount] = await db.query(
       'SELECT COUNT(*) AS total FROM sessions WHERE user_id = ? AND status = "completed"',
@@ -30,7 +30,10 @@ exports.getDashboard = async (req, res) => {
     );
 
     const [profile] = await db.query(
-      'SELECT vo2max, weight_kg FROM athlete_profiles WHERE user_id = ?',
+      `SELECT u.name AS athleteName, ap.vo2max, ap.weight_kg 
+       FROM users u 
+       LEFT JOIN athlete_profiles ap ON ap.user_id = u.id 
+       WHERE u.id = ?`,
       [userId]
     );
 
@@ -64,6 +67,7 @@ exports.getDashboard = async (req, res) => {
       totalSessions,
       lastSession: lastSession[0] || null,
       weeklyData,
+      athleteName: profile[0]?.athleteName || '',
       profile: profile[0] || {},
       hydrationIndex,
       stats: stats[0] || {},
@@ -88,7 +92,7 @@ exports.getWeeklyReport = async (req, res) => {
          AND started_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
        GROUP BY DATE(started_at), intensity
        ORDER BY session_date DESC`,
-      [req.userId]
+      [req.targetUserId]
     );
     res.json(rows);
   } catch (err) {
@@ -109,7 +113,7 @@ exports.getHydrationTrend = async (req, res) => {
          AND ended_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
        GROUP BY DATE(ended_at)
        ORDER BY date ASC`,
-      [req.userId]
+      [req.targetUserId]
     );
     res.json(rows);
   } catch (err) {
@@ -139,7 +143,7 @@ exports.getSessionsHistory = async (req, res) => {
        WHERE user_id = ? AND status = "completed" AND ended_at IS NOT NULL
        ORDER BY ended_at DESC
        LIMIT ?`,
-      [req.userId, limit]
+      [req.targetUserId, limit]
     );
 
     
@@ -153,7 +157,7 @@ exports.getSessionsHistory = async (req, res) => {
        FROM sessions
        WHERE user_id = ? AND status = "completed"
        GROUP BY intensity`,
-      [req.userId]
+      [req.targetUserId]
     );
 
   
@@ -170,7 +174,7 @@ exports.getSessionsHistory = async (req, res) => {
          AND ended_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
        GROUP BY DATE_FORMAT(ended_at, '%Y-%m')
        ORDER BY month_key ASC`,
-      [req.userId]
+      [req.targetUserId]
     );
 
     res.json({ sessions, byIntensity, monthly });

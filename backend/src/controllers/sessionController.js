@@ -37,7 +37,7 @@ exports.list = async (req, res) => {
        WHERE s.user_id = ?
        ORDER BY s.created_at DESC
        LIMIT 50`,
-      [req.userId]
+      [req.targetUserId]
     );
     res.json(rows);
   } catch (err) {
@@ -52,11 +52,34 @@ exports.getOne = async (req, res) => {
         (SELECT SUM(amount_ml) FROM fluid_logs WHERE session_id = s.id) AS total_intake_ml,
         (SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id,'amount_ml',amount_ml,'drink_type',drink_type,'logged_at',logged_at))
          FROM fluid_logs WHERE session_id = s.id) AS fluid_logs
-       FROM sessions s WHERE s.id = ? AND s.user_id = ?`,
-      [req.params.id, req.userId]
+       FROM sessions s WHERE s.id = ?`,
+      [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Sessão não encontrada' });
-    res.json(rows[0]);
+    
+    const session = rows[0];
+
+    // Verificar se o usuário solicitante tem permissão para visualizar esta sessão
+    if (session.user_id !== req.userId) {
+      if (req.userRole === 'admin') {
+        // Permitido
+      } else if (req.userRole === 'coach') {
+        const [accessRows] = await db.query(
+          `SELECT 1 FROM team_members tm
+           JOIN teams t ON tm.team_id = t.id
+           WHERE t.coach_id = ? AND tm.athlete_id = ? AND tm.status = 'accepted'
+           LIMIT 1`,
+          [req.userId, session.user_id]
+        );
+        if (accessRows.length === 0) {
+          return res.status(403).json({ error: 'Acesso negado: você não tem permissão para ver esta sessão' });
+        }
+      } else {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+    }
+
+    res.json(session);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar sessão' });
   }

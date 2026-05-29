@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Filter, Search, Droplets, Clock, Activity, Plus } from 'lucide-react';
+import { Calendar, Filter, Search, Droplets, Clock, Activity, Plus, ArrowLeft } from 'lucide-react';
 import { sessionApi } from '../services/api';
 import AppLayout from '../components/layout/AppLayout';
 import Header from '../components/layout/Header';
@@ -15,6 +15,9 @@ import { isMobileViewport } from '../utils/device';
 
 export default function History() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const targetUserId = searchParams.get('userId');
+
   const [sessions, setSessions] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -23,11 +26,12 @@ export default function History() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    sessionApi.list()
+    setLoaded(false);
+    sessionApi.list(targetUserId)
       .then((r) => setSessions(r.data))
       .catch(() => {})
       .finally(() => setLoaded(true));
-  }, []);
+  }, [targetUserId]);
 
   const isVirgin = loaded && sessions.length === 0;
 
@@ -46,13 +50,14 @@ export default function History() {
   const handleSessionClick = (s) => {
     if (s.status === 'completed') {
       if (isMobileViewport()) {
-        navigate(`/post-session/${s.id}`);
+        navigate(`/post-session/${s.id}${targetUserId ? `?userId=${targetUserId}` : ''}`);
         return;
       }
-
       setSelected(s);
     } else {
-      navigate(`/pre-session/${s.id}`);
+      if (!targetUserId) {
+        navigate(`/pre-session/${s.id}`);
+      }
     }
   };
 
@@ -68,6 +73,24 @@ export default function History() {
       } />
 
       <div className="page-container md:max-w-2xl">
+        {targetUserId && (
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="w-8 h-8 rounded-lg bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-white/70 transition-colors"
+                title="Voltar"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Visualizando Histórico</p>
+                <p className="text-xs text-white/40 mt-0.5">Métricas de treino do atleta</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-semibold bg-white/5 text-white/50 px-2 py-1 rounded-md uppercase">Modo Leitura</span>
+          </div>
+        )}
         <div className="space-y-5">
 
           {/* Summary cards */}

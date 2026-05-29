@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell, RadialBarChart, RadialBar, PieChart, Pie, Legend,
 } from 'recharts';
-import { TrendingUp, Download, Droplets, Clock, Zap, Activity, AlertCircle } from 'lucide-react';
+import { TrendingUp, Download, Droplets, Clock, Zap, Activity, AlertCircle, ArrowLeft } from 'lucide-react';
 import { printAnalyticsReport } from '../utils/printReport';
 import { analyticsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -60,6 +61,10 @@ export default function Analytics() {
   const toast = useToast();
   const { dark } = useTheme();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  const targetUserId = searchParams.get('userId');
   const tickColor = dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)';
 
   const [dashboard, setDashboard] = useState(null);
@@ -68,16 +73,17 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.allSettled([
-      analyticsApi.dashboard(),
-      analyticsApi.hydrationTrend(),
-      analyticsApi.sessionsHistory(20),
+      analyticsApi.dashboard(targetUserId),
+      analyticsApi.hydrationTrend(targetUserId),
+      analyticsApi.sessionsHistory(20, targetUserId),
     ]).then(([dash, tr, hist]) => {
       if (dash.status === 'fulfilled') setDashboard(dash.value.data);
       if (tr.status === 'fulfilled') setTrend(tr.value.data);
       if (hist.status === 'fulfilled') setHistory(hist.value.data);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [targetUserId]);
 
   const hydrationIndex = dashboard?.hydrationIndex ?? null;
   const vo2max = dashboard?.profile?.vo2max ?? null;
@@ -132,7 +138,7 @@ export default function Analytics() {
           <Button
             variant="ghost" size="sm"
             icon={<Download size={15} />}
-            onClick={() => printAnalyticsReport({ dashboard, history, trend, userName: user?.name })}
+            onClick={() => printAnalyticsReport({ dashboard, history, trend, userName: dashboard?.athleteName || user?.name })}
           >
             Exportar
           </Button>
@@ -140,6 +146,25 @@ export default function Analytics() {
       />
 
       <div className="page-container md:max-w-4xl">
+        {targetUserId && (
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="w-8 h-8 rounded-lg bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-white/70 transition-colors"
+                title="Voltar"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Visualizando Atleta</p>
+                <p className="text-sm font-bold text-white mt-0.5">{dashboard?.athleteName || 'Carregando...'}</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-semibold bg-white/5 text-white/50 px-2 py-1 rounded-md uppercase">Modo Leitura</span>
+          </div>
+        )}
+
         <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-5">
 
           {/* Header */}

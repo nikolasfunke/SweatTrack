@@ -17,6 +17,7 @@ const Notifications    = lazy(() => import('./pages/Notifications'));
 const Profile          = lazy(() => import('./pages/Profile'));
 const Settings         = lazy(() => import('./pages/Settings'));
 const AdminUsers       = lazy(() => import('./pages/AdminUsers'));
+const Teams            = lazy(() => import('./pages/Teams'));
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/notifications"    element={<RequireAuth><Notifications /></RequireAuth>} />
           <Route path="/profile"          element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/settings"         element={<RequireAuth><Settings /></RequireAuth>} />
+          <Route path="/teams"            element={<RequireAuth><Teams /></RequireAuth>} />
 
           {/* Admin */}
           <Route path="/admin/users" element={<RequireAdmin><AdminUsers /></RequireAdmin>} />

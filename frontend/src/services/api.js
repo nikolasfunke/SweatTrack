@@ -35,7 +35,7 @@ export const authApi = {
 
 // Sessions
 export const sessionApi = {
-  list: () => api.get('/sessions'),
+  list: (userId) => api.get('/sessions', { params: { userId } }),
   create: (data) => api.post('/sessions', data),
   getOne: (id) => api.get(`/sessions/${id}`),
   updatePre: (id, data) => api.patch(`/sessions/${id}/pre`, data),
@@ -48,10 +48,26 @@ export const sessionApi = {
 
 // Analytics
 export const analyticsApi = {
-  dashboard: () => api.get('/analytics/dashboard'),
-  weekly: () => api.get('/analytics/weekly'),
-  hydrationTrend: () => api.get('/analytics/hydration-trend'),
-  sessionsHistory: (limit = 20) => api.get('/analytics/sessions-history', { params: { limit } }),
+  dashboard: (userId) => api.get('/analytics/dashboard', { params: { userId } }),
+  weekly: (userId) => api.get('/analytics/weekly', { params: { userId } }),
+  hydrationTrend: (userId) => api.get('/analytics/hydration-trend', { params: { userId } }),
+  sessionsHistory: (limit = 20, userId) => api.get('/analytics/sessions-history', { params: { limit, userId } }),
+};
+
+// Teams
+export const teamApi = {
+  list: () => api.get('/teams'),
+  create: (data) => api.post('/teams', data),
+  getOne: (id) => api.get(`/teams/${id}`),
+  delete: (id) => api.delete(`/teams/${id}`),
+  invite: (id, email) => api.post(`/teams/${id}/invite`, { email }),
+  join: (id) => api.post(`/teams/${id}/join`),
+  respond: (id, data) => api.post(`/teams/${id}/respond`, data),
+  leave: (id) => api.post(`/teams/${id}/leave`),
+  removeMember: (id, athleteId) => api.delete(`/teams/${id}/remove/${athleteId}`),
+  respondFromNotification: (notificationId, action) =>
+    api.post(`/teams/requests/${notificationId}/action`, { action }),
+  search: (query) => api.get('/teams/search', { params: { q: query } }),
 };
 
 // Users

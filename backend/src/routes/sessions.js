@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/sessionController');
 const auth = require('../middleware/auth');
+const coachAccess = require('../middleware/coachAccess');
 
 router.use(auth);
-router.get('/', ctrl.list);
+router.get('/', coachAccess, ctrl.list);
 router.post('/', ctrl.create);
 router.get('/:id', ctrl.getOne);
 router.patch('/:id/pre', ctrl.updatePre);

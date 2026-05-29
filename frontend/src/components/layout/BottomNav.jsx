@@ -8,6 +8,7 @@ const BASE_NAV = [
   { to: '/dashboard',  label: 'Início',    icon: Home },
   { to: '/monitor',    label: 'Monitorar', icon: Activity },
   { to: '/analytics',  label: 'Análises',  icon: BarChart3 },
+  { to: '/teams',      label: 'Equipes',   icon: Users },
   { to: '/settings',   label: 'Ajustes',   icon: Settings },
 ];
 

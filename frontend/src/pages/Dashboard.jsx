@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Plus, Thermometer, Zap, Droplets, ChevronRight,
+  Plus, Zap, Droplets, ChevronRight,
   FileText, History, TrendingUp, AlertCircle, ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -203,13 +203,6 @@ export default function Dashboard() {
                     value={last?.sweat_rate_lh ? `${last.sweat_rate_lh} L/h` : '—'}
                     sub={last?.sweat_rate_lh ? sweatLabel.label : undefined}
                     subColor={sweatLabel.color}
-                  />
-                  <StatRow
-                    icon={<Thermometer size={14} className="text-rose-400" />}
-                    label="Temperatura"
-                    value={last?.internal_temp ? `${last.internal_temp}°C` : '—'}
-                    sub={last?.internal_temp ? (last.internal_temp > 38.5 ? 'ALERTA' : 'Normal') : undefined}
-                    subColor={last?.internal_temp > 38.5 ? 'text-rose-400' : 'text-emerald-400'}
                   />
                 </div>
               </div>

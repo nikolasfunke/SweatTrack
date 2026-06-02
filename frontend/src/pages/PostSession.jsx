@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Trash2,
+  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Trash2, AlertTriangle,
 } from 'lucide-react';
 import { sessionApi } from '../services/api';
 import { printSessionReport } from '../utils/printReport';
@@ -76,6 +76,12 @@ export default function PostSession() {
     ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     : relativeDate(session.created_at);
 
+  // Weight variation in percentage
+  const hasWeightVariation = session.pre_weight_kg && session.post_weight_kg;
+  const weightLossKg = hasWeightVariation ? session.pre_weight_kg - session.post_weight_kg : 0;
+  const weightLossPct = hasWeightVariation ? (weightLossKg / session.pre_weight_kg) * 100 : 0;
+  const isWeightAlert = weightLossPct > 2;
+
   return (
     <AppLayout>
       <Header title="Pós-Sessão" showBack />
@@ -142,6 +148,14 @@ export default function PostSession() {
               hintClass={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
             />
             <MetricCard
+              icon={<Scale size={14} className={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'} />}
+              label="Variação de Peso"
+              value={hasWeightVariation ? `-${weightLossPct.toFixed(1)}%` : '—'}
+              hint={hasWeightVariation ? (isWeightAlert ? 'Desidratação > 2%' : 'Dentro do esperado') : 'Sem peso pós-sessão'}
+              hintClass={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'}
+              alert={isWeightAlert}
+            />
+            <MetricCard
               icon={<Droplets size={14} className="text-sky-400" />}
               label="Ingestão Total"
               value={`${session.total_fluid_intake_ml ?? 0} ml`}
@@ -165,12 +179,24 @@ export default function PostSession() {
                 <WeightStat label="Pré-sessão" value={session.pre_weight_kg} />
                 <WeightStat label="Pós-sessão" value={session.post_weight_kg} />
               </div>
-              {session.pre_weight_kg && session.post_weight_kg ? (
+              {hasWeightVariation && (
                 <div className="mt-3 rounded-2xl bg-surface-2 px-3 py-2 text-xs text-white/55">
-                  Variação: <span className="font-bold text-rose-400">-{(session.pre_weight_kg - session.post_weight_kg).toFixed(2)} kg</span>
+                  Perda: <span className="font-bold text-white">{weightLossKg.toFixed(2)} kg</span>
                 </div>
-              ) : null}
+              )}
             </Card>
+          )}
+
+          {isWeightAlert && (
+            <div className="rounded-[24px] border border-rose-500/30 bg-rose-500/10 p-4 flex items-start gap-3">
+              <AlertTriangle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-rose-400 mb-1">Alerta de Desidratação</p>
+                <p className="text-xs text-rose-300/80 leading-relaxed">
+                  A perda de massa corporal excedeu 2% do peso inicial ({weightLossPct.toFixed(1)}%), indicando desidratação significativa. Reforçar a reposição hídrica imediatamente.
+                </p>
+              </div>
+            </div>
           )}
 
           {recoveryMl ? (
@@ -227,14 +253,14 @@ export default function PostSession() {
   );
 }
 
-function MetricCard({ icon, label, value, hint, hintClass = 'text-white/35' }) {
+function MetricCard({ icon, label, value, hint, hintClass = 'text-white/35', alert }) {
   return (
-    <div className="rounded-[22px] border border-border bg-surface-1 p-3.5 shadow-card">
+    <div className={`rounded-[22px] border ${alert ? 'border-rose-500/30 bg-rose-500/5' : 'border-border bg-surface-1'} p-3.5 shadow-card`}>
       <div className="flex items-center gap-1.5">
         {icon}
         <span className="text-[10px] font-medium text-white/40">{label}</span>
       </div>
-      <p className="mt-2 text-lg font-black leading-tight">{value}</p>
+      <p className={`mt-2 text-lg font-black leading-tight ${alert ? 'text-rose-400' : ''}`}>{value}</p>
       {hint ? <p className={`mt-1 text-[10px] font-bold ${hintClass}`}>{hint}</p> : null}
     </div>
   );

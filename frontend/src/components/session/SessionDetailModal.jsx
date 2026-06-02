@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Activity, Clock, Droplets, TrendingDown, Thermometer, Scale, Download, Trash2,
+  Activity, Clock, Droplets, TrendingDown, Scale, Download, Trash2, AlertTriangle,
 } from 'lucide-react';
 import Modal, { ConfirmModal } from '../ui/Modal';
 import Button from '../ui/Button';
@@ -29,6 +29,12 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
   const recoveryMl = deficitMl > 0 ? calcRecoveryFluid(deficitMl) : null;
   const intColor = INTENSITY_COLOR[session.intensity] ?? '#C41E3A';
+
+  // Weight variation in percentage
+  const hasWeightVariation = session.pre_weight_kg && session.post_weight_kg;
+  const weightLossKg = hasWeightVariation ? session.pre_weight_kg - session.post_weight_kg : 0;
+  const weightLossPct = hasWeightVariation ? (weightLossKg / session.pre_weight_kg) * 100 : 0;
+  const isWeightAlert = weightLossPct > 2;
 
   const sessionDate = session.ended_at
     ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -84,25 +90,26 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
           subColor={sweatLabel.color}
         />
         <MetricTile
+          icon={<Scale size={14} className={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'} />}
+          label="Variação de Peso"
+          value={hasWeightVariation ? `-${weightLossPct.toFixed(1)}%` : '—'}
+          sub={hasWeightVariation ? (isWeightAlert ? 'Desidratação > 2%' : 'Dentro do esperado') : undefined}
+          subColor={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'}
+          alert={isWeightAlert}
+        />
+        <MetricTile
           icon={<TrendingDown size={14} className="text-rose-400" />}
           label="Déficit Hídrico"
           value={session.hydric_deficit_ml ? `${(deficitMl / 1000).toFixed(2)} L` : '—'}
           sub={deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Normal' : undefined}
           subColor={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
         />
-        <MetricTile
-          icon={<Thermometer size={14} className="text-violet-400" />}
-          label="Temp. Interna"
-          value={session.internal_temp ? `${session.internal_temp}°C` : '—'}
-          sub={session.internal_temp ? (session.internal_temp > 38.5 ? 'ALERTA' : 'Normal') : undefined}
-          subColor={session.internal_temp > 38.5 ? 'text-rose-400' : 'text-emerald-400'}
-        />
       </div>
 
       {/* Ambient temp row */}
       {session.ambient_temp && (
         <div className="bg-surface-2 rounded-2xl p-3 flex items-center gap-3">
-          <Thermometer size={14} className="text-sky-400 flex-shrink-0" />
+          <Scale size={14} className="text-sky-400 flex-shrink-0" />
           <div>
             <p className="text-[10px] text-white/30">Temperatura Ambiente (no momento)</p>
             <p className="font-bold text-sm">{session.ambient_temp}°C</p>
@@ -127,14 +134,29 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
                 <p className="font-bold text-sm">{session.post_weight_kg} kg</p>
               </div>
             )}
-            {session.pre_weight_kg && session.post_weight_kg && (
+            {hasWeightVariation && (
               <div>
                 <p className="text-[10px] text-white/30">Variação</p>
-                <p className="font-bold text-sm text-rose-400">
-                  -{(session.pre_weight_kg - session.post_weight_kg).toFixed(2)} kg
+                <p className={`font-bold text-sm ${isWeightAlert ? 'text-rose-400' : 'text-emerald-400'}`}>
+                  -{weightLossPct.toFixed(1)}%
                 </p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Weight loss alert */}
+      {isWeightAlert && (
+        <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-3 flex items-start gap-2">
+          <AlertTriangle size={14} className="text-rose-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-0.5">
+              Alerta de Desidratação
+            </p>
+            <p className="text-xs text-rose-300/80 leading-relaxed">
+              Perda de {weightLossPct.toFixed(1)}% da massa corporal (> 2%). Reforçar reposição hídrica.
+            </p>
           </div>
         </div>
       )}
@@ -178,14 +200,14 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
   );
 }
 
-function MetricTile({ icon, label, value, sub, subColor }) {
+function MetricTile({ icon, label, value, sub, subColor, alert }) {
   return (
-    <div className="bg-surface-2 rounded-2xl p-3 space-y-1">
+    <div className={`rounded-2xl p-3 space-y-1 ${alert ? 'bg-rose-500/10 border border-rose-500/25' : 'bg-surface-2'}`}>
       <div className="flex items-center gap-1.5">
         {icon}
         <span className="text-[10px] text-white/40 font-medium">{label}</span>
       </div>
-      <p className="font-black text-base leading-tight">{value}</p>
+      <p className={`font-black text-base leading-tight ${alert ? 'text-rose-400' : ''}`}>{value}</p>
       {sub && <p className={`text-[10px] font-bold ${subColor ?? 'text-white/40'}`}>{sub}</p>}
     </div>
   );

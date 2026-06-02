@@ -53,19 +53,22 @@ export function printSessionReport(session) {
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
   const sweat     = parseFloat(session.sweat_rate_lh ?? 0);
   const duration  = session.duration_minutes ?? 0;
-  const temp      = session.internal_temp;
   const intensity = session.intensity ?? 'moderada';
   const typeLabel = { training: 'Treino', match: 'Jogo', recovery: 'Recuperação' }[session.session_type] ?? 'Sessão';
   const recoveryMl = deficitMl > 0 ? Math.round(deficitMl * 1.5) : null;
   const recoveryH  = deficitMl > 0 ? Math.max(8, Math.round(deficitMl / 200)) : 8;
 
-  const dateStr = session.ended_at
+  // Weight variation in percentage
+  const hasWeightVariation = session.pre_weight_kg && session.post_weight_kg;
+  const weightLossKg = hasWeightVariation ? session.pre_weight_kg - session.post_weight_kg : 0;
+  const weightLossPct = hasWeightVariation ? (weightLossKg / session.pre_weight_kg) * 100 : 0;
+  const isWeightAlert = weightLossPct > 2;
+  const dateStr = session.ended_at 
     ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     : new Date(session.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
   const intColor = intensityColor(intensity);
   const sweatClass = sweat >= 1.5 ? 'alert' : sweat >= 0.8 ? 'warn' : 'ok';
-  const tempClass  = temp > 38.5 ? 'alert' : 'ok';
 
   const html = `<!DOCTYPE html><html lang="pt-BR"><head>${base}<title>Relatório de Sessão — ${dateStr}</title></head><body>
     ${logoHtml()}
@@ -86,19 +89,25 @@ export function printSessionReport(session) {
         <div class="value ${deficitMl > 2000 ? 'alert' : 'ok'}">${deficitMl > 0 ? (deficitMl/1000).toFixed(2)+' L' : '—'}</div>
         <div class="sub ${deficitMl > 2000 ? 'alert' : 'ok'}">${deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Aceitável' : ''}</div>
       </div>
-      <div class="card">
-        <div class="label">Temperatura Interna</div>
-        <div class="value ${temp ? tempClass : ''}">${temp ? temp+'°C' : '—'}</div>
-        <div class="sub ${temp ? tempClass : ''}">${temp > 38.5 ? 'ALERTA' : temp ? 'Normal' : ''}</div>
-      </div>
     </div>
 
-    ${(session.pre_weight_kg || session.post_weight_kg) ? `
+    ${hasWeightVariation ? `
     <div class="section-title">Variação de Peso Corporal</div>
     <div class="grid-3">
       <div class="card"><div class="label">Pré-Treino</div><div class="value">${session.pre_weight_kg ?? '—'} kg</div></div>
       <div class="card"><div class="label">Pós-Treino</div><div class="value">${session.post_weight_kg ?? '—'} kg</div></div>
-      ${session.pre_weight_kg && session.post_weight_kg ? `<div class="card highlight"><div class="label">Variação</div><div class="value alert">-${(session.pre_weight_kg - session.post_weight_kg).toFixed(2)} kg</div></div>` : ''}
+      <div class="card ${isWeightAlert ? 'highlight' : ''}"><div class="label">Variação</div><div class="value ${isWeightAlert ? 'alert' : 'ok'}">-${weightLossPct.toFixed(1)}%</div><div class="sub">${weightLossKg.toFixed(2)} kg</div></div>
+    </div>
+    ${isWeightAlert ? `
+    <div class="recovery-box" style="border-color:#C41E3A;background:#fff5f7;margin-top:8px;margin-bottom:16px">
+      <div class="kicker">⚠ Alerta de Desidratação</div>
+      <div class="headline" style="font-size:14px">Perda de ${weightLossPct.toFixed(1)}% da massa corporal</div>
+      <div class="note">A perda excedeu 2% do peso inicial, indicando desidratação significativa. Reforçar a reposição hídrica imediatamente.</div>
+    </div>` : ''}` : (session.pre_weight_kg || session.post_weight_kg) ? `
+    <div class="section-title">Variação de Peso Corporal</div>
+    <div class="grid">
+      <div class="card"><div class="label">Pré-Treino</div><div class="value">${session.pre_weight_kg ?? '—'} kg</div></div>
+      <div class="card"><div class="label">Pós-Treino</div><div class="value">${session.post_weight_kg ?? '—'} kg</div></div>
     </div>` : ''}
 
     <div class="section-title">Protocolo de Recuperação</div>

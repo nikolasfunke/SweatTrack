@@ -90,19 +90,19 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
           subColor={sweatLabel.color}
         />
         <MetricTile
+          icon={<TrendingDown size={14} className="text-rose-400" />}
+          label="Déficit Hídrico"
+          value={session.hydric_deficit_ml ? `${(deficitMl / 1000).toFixed(2)} L` : '—'}
+          sub={deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Normal' : undefined}
+          subColor={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
+        />
+        <MetricTile
           icon={<Scale size={14} className={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'} />}
           label="Variação de Peso"
           value={hasWeightVariation ? `-${weightLossPct.toFixed(1)}%` : '—'}
           sub={hasWeightVariation ? (isWeightAlert ? 'Desidratação > 2%' : 'Dentro do esperado') : undefined}
           subColor={isWeightAlert ? 'text-rose-400' : 'text-emerald-400'}
           alert={isWeightAlert}
-        />
-        <MetricTile
-          icon={<TrendingDown size={14} className="text-rose-400" />}
-          label="Déficit Hídrico"
-          value={session.hydric_deficit_ml ? `${(deficitMl / 1000).toFixed(2)} L` : '—'}
-          sub={deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Normal' : undefined}
-          subColor={deficitMl > 2000 ? 'text-rose-400' : 'text-emerald-400'}
         />
       </div>
 
@@ -132,14 +132,6 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
               <div>
                 <p className="text-[10px] text-white/30">Pós-treino</p>
                 <p className="font-bold text-sm">{session.post_weight_kg} kg</p>
-              </div>
-            )}
-            {hasWeightVariation && (
-              <div>
-                <p className="text-[10px] text-white/30">Variação</p>
-                <p className={`font-bold text-sm ${isWeightAlert ? 'text-rose-400' : 'text-emerald-400'}`}>
-                  -{weightLossPct.toFixed(1)}%
-                </p>
               </div>
             )}
           </div>

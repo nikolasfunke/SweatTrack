@@ -86,7 +86,6 @@ export default function Analytics() {
   }, [targetUserId]);
 
   const hydrationIndex = dashboard?.hydrationIndex ?? null;
-  const vo2max = dashboard?.profile?.vo2max ?? null;
   const stats = dashboard?.stats ?? {};
   const totalSessions = dashboard?.totalSessions ?? 0;
   const lastSession = dashboard?.lastSession ?? null;
@@ -238,36 +237,20 @@ export default function Analytics() {
               )}
             </Card>
 
-            {/* VO2max + recovery */}
-            <div className="space-y-4">
-              <Card>
-                <p className="section-title">VO₂ Máx</p>
-                {vo2max !== null ? (
-                  <>
-                    <div className="flex items-end gap-1">
-                      <p className="text-4xl font-black tabular-nums">{vo2max}</p>
-                      <p className="text-sm text-white/40 mb-1">ml/kg/min</p>
-                    </div>
-                    <p className="text-xs text-emerald-400 font-semibold mt-0.5">Perfil do atleta</p>
-                  </>
-                ) : (
-                  <p className="text-3xl font-black text-white/20 mt-1">—</p>
-                )}
-              </Card>
-              <Card>
-                <p className="section-title">Próximo Treino</p>
-                {recoveryHours !== null ? (
-                  <div className="flex items-end gap-2">
-                    <p className="text-4xl font-black tabular-nums">
-                      {recoveryHours}<span className="text-xl text-white/40">h</span>
-                    </p>
-                    <p className="text-xs text-white/40 mb-1">recuperação estimada</p>
-                  </div>
-                ) : (
-                  <p className="text-3xl font-black text-white/20 mt-1">—</p>
-                )}
-              </Card>
-            </div>
+            {/* Próximo treino */}
+            <Card className="flex flex-col justify-center">
+              <p className="section-title">Próximo Treino</p>
+              {recoveryHours !== null ? (
+                <div className="flex items-end gap-2 mt-2">
+                  <p className="text-5xl font-black tabular-nums">
+                    {recoveryHours}<span className="text-2xl text-white/40">h</span>
+                  </p>
+                  <p className="text-sm text-white/40 mb-1.5">recuperação estimada</p>
+                </div>
+              ) : (
+                <p className="text-4xl font-black text-white/20 mt-2">—</p>
+              )}
+            </Card>
           </motion.div>
 
           {/* ── Taxa de sudorese — histórico de sessões ── */}

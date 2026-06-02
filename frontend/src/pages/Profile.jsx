@@ -22,7 +22,6 @@ export default function Profile() {
     sport: user?.profile?.sport || '',
     birthDate: user?.profile?.birthDate?.split('T')[0] || '',
     gender: user?.profile?.gender || '',
-    vo2max: user?.profile?.vo2max || '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -38,7 +37,6 @@ export default function Profile() {
         sport: form.sport || undefined,
         birthDate: form.birthDate || undefined,
         gender: form.gender || undefined,
-        vo2max: form.vo2max ? parseFloat(form.vo2max) : undefined,
       });
       await refetch();
       toast('Perfil atualizado!', 'success');
@@ -115,11 +113,9 @@ export default function Profile() {
                   value={form.weightKg} onChange={set('weightKg')} suffix="kg"
                   icon={<Weight size={15} />} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <Input label="Esporte" placeholder="Futebol" value={form.sport}
                   onChange={set('sport')} icon={<Activity size={15} />} />
-                <Input label="VO₂ Máx" type="number" step="0.1" placeholder="55.0"
-                  value={form.vo2max} onChange={set('vo2max')} suffix="ml/kg/min" />
               </div>
             </div>
           </Card>

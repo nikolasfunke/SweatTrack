@@ -99,6 +99,29 @@ export default function Monitor() {
       <div className="page-container md:max-w-2xl">
         <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-5">
 
+          {/* Active sessions */}
+          {loaded && activeSessions.length > 0 && (
+            <motion.div variants={fadeUp}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Sessão Ativa</p>
+              </div>
+              <div className="space-y-3">
+                {activeSessions.map((s) => (
+                  <div key={s.id} className="relative rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-1">
+                    <SessionCard
+                      session={s}
+                      onClick={() => handleSessionClick(s)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           {/* CTA hero */}
           <motion.div variants={fadeUp}>
             <div className="bg-gradient-to-br from-primary/20 to-rose-900/10 border border-primary/20 rounded-2xl p-5">
@@ -119,21 +142,7 @@ export default function Monitor() {
             </div>
           </motion.div>
 
-          {/* Active sessions */}
-          {loaded && activeSessions.length > 0 && (
-            <motion.div variants={fadeUp}>
-              <p className="section-title">Em andamento</p>
-              <div className="space-y-3">
-                {activeSessions.map((s) => (
-                  <SessionCard
-                    key={s.id}
-                    session={s}
-                    onClick={() => handleSessionClick(s)}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          )}
+
 
           {/* Protocol steps */}
           <motion.div variants={fadeUp}>

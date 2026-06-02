@@ -162,8 +162,8 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
         <div class="value">${stats.avg_duration ? Math.round(stats.avg_duration)+' min' : '—'}</div>
       </div>
       <div class="card">
-        <div class="label">Taxa de Suor Máx.</div>
-        <div class="value alert">${stats.max_sweat_rate ? parseFloat(stats.max_sweat_rate).toFixed(2)+' L/h' : '—'}</div>
+        <div class="label">Var. de Peso Méd.</div>
+        <div class="value alert">-${stats.avg_weight_loss_pct ? parseFloat(stats.avg_weight_loss_pct).toFixed(1)+'%' : '—'}</div>
       </div>
     </div>
 

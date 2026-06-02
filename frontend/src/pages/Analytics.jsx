@@ -5,7 +5,7 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell, RadialBarChart, RadialBar, PieChart, Pie, Legend,
 } from 'recharts';
-import { TrendingUp, Download, Droplets, Clock, Zap, Activity, AlertCircle, ArrowLeft } from 'lucide-react';
+import { TrendingUp, Download, Droplets, Clock, Zap, Activity, AlertCircle, ArrowLeft, Scale } from 'lucide-react';
 import { printAnalyticsReport } from '../utils/printReport';
 import { analyticsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -200,7 +200,7 @@ export default function Analytics() {
               { label: 'Sessões', value: totalSessions, unit: '', icon: <Activity size={14} className="text-primary" /> },
               { label: 'Tx. Suor Méd.', value: stats.avg_sweat_rate ? parseFloat(stats.avg_sweat_rate).toFixed(2) : '—', unit: ' L/h', icon: <Droplets size={14} className="text-sky-400" /> },
               { label: 'Duração Méd.', value: stats.avg_duration ? Math.round(stats.avg_duration) : '—', unit: stats.avg_duration ? ' min' : '', icon: <Clock size={14} className="text-amber-400" /> },
-              { label: 'Tx. Suor Máx.', value: stats.max_sweat_rate ? parseFloat(stats.max_sweat_rate).toFixed(2) : '—', unit: stats.max_sweat_rate ? ' L/h' : '', icon: <Zap size={14} className="text-rose-400" /> },
+              { label: 'Var. Peso Méd.', value: stats.avg_weight_loss_pct ? `-${parseFloat(stats.avg_weight_loss_pct).toFixed(1)}` : '—', unit: stats.avg_weight_loss_pct ? '%' : '', icon: <Scale size={14} className="text-rose-400" /> },
             ].map(({ label, value, unit, icon }) => (
               <Card key={label} className="!p-3.5">
                 <div className="flex items-center gap-2 mb-1.5">

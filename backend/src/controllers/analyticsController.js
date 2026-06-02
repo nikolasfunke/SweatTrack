@@ -54,7 +54,7 @@ exports.getDashboard = async (req, res) => {
     const [stats] = await db.query(
       `SELECT
          AVG(sweat_rate_lh)    AS avg_sweat_rate,
-         MAX(sweat_rate_lh)    AS max_sweat_rate,
+         AVG(CASE WHEN pre_weight_kg > 0 AND post_weight_kg > 0 THEN ((pre_weight_kg - post_weight_kg) / pre_weight_kg) * 100 ELSE NULL END) AS avg_weight_loss_pct,
          AVG(duration_minutes) AS avg_duration,
          SUM(duration_minutes) AS total_minutes,
          AVG(hydric_deficit_ml) AS avg_deficit

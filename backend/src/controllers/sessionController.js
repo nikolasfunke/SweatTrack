@@ -16,10 +16,10 @@ function calcSweatMetrics({ preWeight, postWeight, fluidIntakeMl, durationMin })
 
 exports.create = async (req, res) => {
   try {
-    const { sessionType = 'training', intensity = 'moderada', ambientTemp, humidity } = req.body;
+    const { sessionType = 'training', ambientTemp, humidity } = req.body;
     const [result] = await db.query(
       'INSERT INTO sessions (user_id, session_type, intensity, status, ambient_temp, humidity) VALUES (?, ?, ?, "pre", ?, ?)',
-      [req.userId, sessionType, intensity, ambientTemp || null, humidity || null]
+      [req.userId, sessionType, null, ambientTemp || null, humidity || null]
     );
     res.status(201).json({ id: result.insertId, status: 'pre' });
   } catch (err) {
@@ -56,7 +56,7 @@ exports.getOne = async (req, res) => {
       [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Sessão não encontrada' });
-    
+
     const session = rows[0];
 
     // Verificar se o usuário solicitante tem permissão para visualizar esta sessão
@@ -119,7 +119,7 @@ exports.logFluid = async (req, res) => {
       'INSERT INTO fluid_logs (session_id, amount_ml, drink_type) VALUES (?, ?, ?)',
       [req.params.id, amountMl, drinkType]
     );
-    
+
     await db.query(
       'UPDATE sessions SET total_fluid_intake_ml = total_fluid_intake_ml + ? WHERE id = ?',
       [amountMl, req.params.id]
@@ -145,7 +145,7 @@ exports.updateTemp = async (req, res) => {
 
 exports.finish = async (req, res) => {
   try {
-    const { postWeightKg, durationMinutes, internalTemp, ambientTemp } = req.body;
+    const { postWeightKg, durationMinutes, internalTemp, ambientTemp, intensity } = req.body;
     const normalizedPostWeight = postWeightKg === null || postWeightKg === undefined || postWeightKg === ''
       ? null
       : parseFloat(postWeightKg);
@@ -168,12 +168,14 @@ exports.finish = async (req, res) => {
        post_weight_kg = ?, duration_minutes = ?,
        sweat_rate_lh = ?, hydric_deficit_ml = ?,
        internal_temp = COALESCE(?, internal_temp),
-       ambient_temp = COALESCE(?, ambient_temp)
+       ambient_temp = COALESCE(?, ambient_temp),
+       intensity = COALESCE(?, intensity)
        WHERE id = ? AND user_id = ?`,
       [
         normalizedPostWeight, durationMinutes,
         metrics.sweatRateLh ?? null, metrics.hydricDeficitMl ?? null,
         internalTemp || null, ambientTemp || null,
+        intensity || null,
         req.params.id, req.userId,
       ]
     );

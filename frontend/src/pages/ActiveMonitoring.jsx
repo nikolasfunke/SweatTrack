@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Droplets, Activity, StopCircle, Lightbulb, MapPin, CloudSun } from 'lucide-react';
+import { Plus, Droplets, Activity, StopCircle, Lightbulb, MapPin, CloudSun, Timer, Pencil } from 'lucide-react';
 import { sessionApi } from '../services/api';
 import { useToast } from '../components/ui/Toast';
 import AppLayout from '../components/layout/AppLayout';
@@ -21,10 +21,10 @@ export default function ActiveMonitoring() {
   const toast = useToast();
 
   // ── localStorage keys (all scoped to this session id) ──────────────────────
-  const keyStart    = `session_start_${id}`;
-  const keyLogs     = `session_logs_${id}`;
-  const keyTotal    = `session_total_${id}`;
-  const keyDeficit  = `session_deficit_${id}`;
+  const keyStart = `session_start_${id}`;
+  const keyLogs = `session_logs_${id}`;
+  const keyTotal = `session_total_${id}`;
+  const keyDeficit = `session_deficit_${id}`;
 
   // ── Persistent timer ─────────────────────────────────────────────────────────
   const getOrCreateStartTime = () => {
@@ -61,9 +61,13 @@ export default function ActiveMonitoring() {
   const [showFluid, setShowFluid] = useState(false);
   const [customFluid, setCustomFluid] = useState('');
   const [postWeight, setPostWeight] = useState('');
+  const [intensity, setIntensity] = useState('moderada');
   const [finishing, setFinishing] = useState(false);
   const [ambientTemp, setAmbientTemp] = useState(null);
   const [geoStatus, setGeoStatus] = useState('idle');
+  const [timerMode, setTimerMode] = useState('auto'); // 'auto' | 'manual'
+  const [manualHours, setManualHours] = useState('');
+  const [manualMinutes, setManualMinutes] = useState('');
   const tickRef = useRef(null);
 
   useEffect(() => {
@@ -138,13 +142,30 @@ export default function ActiveMonitoring() {
     }
   };
 
+  const getFinalDurationMinutes = () => {
+    if (timerMode === 'manual') {
+      const h = parseInt(manualHours) || 0;
+      const m = parseInt(manualMinutes) || 0;
+      return h * 60 + m;
+    }
+    return Math.round(elapsed / 60);
+  };
+
   const handleFinish = async () => {
+    if (timerMode === 'manual') {
+      const dur = getFinalDurationMinutes();
+      if (dur <= 0) {
+        toast('Informe a duração da sessão', 'warning');
+        return;
+      }
+    }
     setFinishing(true);
     try {
       await sessionApi.finish(id, {
         postWeightKg: postWeight ? parseFloat(postWeight) : null,
-        durationMinutes: Math.round(elapsed / 60),
+        durationMinutes: getFinalDurationMinutes(),
         ambientTemp: ambientTemp ?? undefined,
+        intensity,
       });
       // Clear all persisted session data after session ends
       localStorage.removeItem(keyStart);
@@ -192,10 +213,91 @@ export default function ActiveMonitoring() {
                   <MapPin size={10} /> {ambientTemp}°C ext.
                 </span>
               )}
-              <span className="font-mono text-sm text-white/60 font-medium">
-                {formatTimer(elapsed)}
-              </span>
+              {timerMode === 'auto' && (
+                <span className="font-mono text-sm text-white/60 font-medium">
+                  {formatTimer(elapsed)}
+                </span>
+              )}
+              {timerMode === 'manual' && (
+                <span className="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">
+                  Manual
+                </span>
+              )}
             </div>
+          </motion.div>
+
+          {/* Timer mode toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center gap-2 p-1 rounded-xl bg-surface-2 border border-border">
+              <button
+                onClick={() => setTimerMode('auto')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  timerMode === 'auto'
+                    ? 'bg-primary/15 border border-primary/40 text-white shadow-sm'
+                    : 'text-white/40 hover:text-white/60'
+                }`}
+              >
+                <Timer size={13} />
+                Cronômetro
+              </button>
+              <button
+                onClick={() => setTimerMode('manual')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  timerMode === 'manual'
+                    ? 'bg-primary/15 border border-primary/40 text-white shadow-sm'
+                    : 'text-white/40 hover:text-white/60'
+                }`}
+              >
+                <Pencil size={13} />
+                Duração Manual
+              </button>
+            </div>
+
+            {timerMode === 'manual' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-3"
+              >
+                <Card>
+                  <p className="text-xs text-white/40 font-semibold mb-3">Informe a duração da sessão</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="23"
+                        placeholder="0"
+                        value={manualHours}
+                        onChange={(e) => setManualHours(e.target.value)}
+                        suffix="h"
+                        className="text-center text-lg font-black"
+                      />
+                    </div>
+                    <span className="text-white/20 font-black text-lg">:</span>
+                    <div className="flex-1">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="59"
+                        placeholder="00"
+                        value={manualMinutes}
+                        onChange={(e) => setManualMinutes(e.target.value)}
+                        suffix="min"
+                        className="text-center text-lg font-black"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-white/25 mt-2 text-center">
+                    O cronômetro automático continua rodando em segundo plano
+                  </p>
+                </Card>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Main sweat rate card */}
@@ -344,8 +446,31 @@ export default function ActiveMonitoring() {
             suffix="KG"
           />
           <div className="bg-surface-2 rounded-xl p-3 text-sm text-white/50">
-            <p>Duração: <span className="text-white font-bold">{formatTimer(elapsed)}</span></p>
+            <p>Duração{timerMode === 'manual' ? ' (manual)' : ''}: <span className="text-white font-bold">
+              {timerMode === 'manual'
+                ? `${parseInt(manualHours) || 0}h ${parseInt(manualMinutes) || 0}min`
+                : formatTimer(elapsed)
+              }
+            </span></p>
             <p>Ingestão total: <span className="text-white font-bold">{totalFluid}ml</span></p>
+          </div>
+          <div>
+            <label className="label">Intensidade da Sessão</label>
+            <div className="grid grid-cols-4 gap-2">
+              {['baixa', 'moderada', 'alta', 'variada'].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setIntensity(v)}
+                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${intensity === v
+                    ? 'bg-primary/15 border-primary/40 text-white'
+                    : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
           </div>
           <Button variant="danger" size="xl" loading={finishing} onClick={handleFinish}
             icon={<StopCircle size={16} />}

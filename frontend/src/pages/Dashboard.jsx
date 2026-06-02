@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [sessions, setSessions] = useState([]);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
   const [showNewSession, setShowNewSession] = useState(false);
-  const [sessionForm, setSessionForm] = useState({ sessionType: 'training', intensity: 'moderada' });
+  const [sessionForm, setSessionForm] = useState({ sessionType: 'training' });
   const [creating, setCreating] = useState(false);
   const [detailSession, setDetailSession] = useState(null);
 
@@ -334,8 +334,8 @@ export default function Dashboard() {
                   type="button"
                   onClick={() => setSessionForm((f) => ({ ...f, sessionType: val }))}
                   className={`p-3 rounded-xl border text-sm font-semibold transition-all ${sessionForm.sessionType === val
-                      ? 'bg-primary/15 border-primary/40 text-white'
-                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                    ? 'bg-primary/15 border-primary/40 text-white'
+                    : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
                     }`}
                 >
                   <div className="text-xl mb-1">{emoji}</div>
@@ -345,24 +345,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div>
-            <label className="label">Intensidade</label>
-            <div className="grid grid-cols-4 gap-2">
-              {['baixa', 'moderada', 'alta', 'variada'].map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setSessionForm((f) => ({ ...f, intensity: v }))}
-                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${sessionForm.intensity === v
-                      ? 'bg-primary/15 border-primary/40 text-white'
-                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
-                    }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <Button variant="primary" size="xl" loading={creating} onClick={handleCreateSession}>
             Criar Sessão

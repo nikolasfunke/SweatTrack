@@ -29,14 +29,14 @@ export default function Monitor() {
   const [sessions, setSessions] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ sessionType: 'training', intensity: 'moderada' });
+  const [form, setForm] = useState({ sessionType: 'training' });
   const [creating, setCreating] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
 
   useEffect(() => {
     sessionApi.list()
       .then((r) => setSessions(r.data.slice(0, 5)))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoaded(true));
   }, []);
 
@@ -210,19 +210,18 @@ export default function Monitor() {
             <label className="label">Tipo de Sessão</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { val: 'training', label: 'Treino',  emoji: '🏋️' },
-                { val: 'match',    label: 'Jogo',    emoji: '⚽' },
-                { val: 'recovery', label: 'Recup.',  emoji: '🧘' },
+                { val: 'training', label: 'Treino', emoji: '🏋️' },
+                { val: 'match', label: 'Jogo', emoji: '⚽' },
+                { val: 'recovery', label: 'Recup.', emoji: '🧘' },
               ].map(({ val, label, emoji }) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => setForm((f) => ({ ...f, sessionType: val }))}
-                  className={`p-3 rounded-xl border text-sm font-semibold transition-all ${
-                    form.sessionType === val
+                  className={`p-3 rounded-xl border text-sm font-semibold transition-all ${form.sessionType === val
                       ? 'bg-primary/15 border-primary/40 text-white'
                       : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
-                  }`}
+                    }`}
                 >
                   <div className="text-xl mb-1">{emoji}</div>
                   {label}
@@ -230,25 +229,7 @@ export default function Monitor() {
               ))}
             </div>
           </div>
-          <div>
-            <label className="label">Intensidade</label>
-            <div className="grid grid-cols-4 gap-2">
-              {['baixa', 'moderada', 'alta', 'variada'].map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, intensity: v }))}
-                  className={`py-2 rounded-xl border text-xs font-bold capitalize transition-all ${
-                    form.intensity === v
-                      ? 'bg-primary/15 border-primary/40 text-white'
-                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
+
           <Button variant="primary" size="xl" loading={creating} onClick={handleCreate}>
             Criar Sessão
           </Button>
@@ -261,7 +242,7 @@ export default function Monitor() {
         onClose={() => setSelectedSession(null)}
         onDeleted={() => {
           setSelectedSession(null);
-          sessionApi.list().then((r) => setSessions(r.data.slice(0, 5))).catch(() => {});
+          sessionApi.list().then((r) => setSessions(r.data.slice(0, 5))).catch(() => { });
         }}
       />
     </AppLayout>

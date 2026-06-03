@@ -164,7 +164,7 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
               Alerta de Desidratação
             </p>
             <p className="text-xs text-rose-300/80 leading-relaxed">
-              Perda de {weightLossPct.toFixed(1)}% da massa corporal (> 2%). Reforçar reposição hídrica.
+              Perda de {weightLossPct.toFixed(1)}% da massa corporal (&gt; 2%). Reforçar reposição hídrica.
             </p>
           </div>
         </div>

@@ -1,8 +1,6 @@
 /* Opens a styled print window that the user can save as PDF via the browser dialog. */
-
 const RED = '#C41E3A';
 const DARK = '#111111';
-
 const base = `
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -37,18 +35,15 @@ const base = `
     @media print{body{padding:20px}button{display:none!important}}
   </style>
 `;
-
 function logoHtml() {
   return `<div class="logo">
     <img src="${window.location.origin}/logo.png" onerror="this.style.display='none'"/>
     <span class="logo-text">Sweat-Track</span>
   </div>`;
 }
-
 function intensityColor(v) {
   return { baixa: '#059669', moderada: '#d97706', alta: '#C41E3A', variada: '#7c3aed' }[v] ?? RED;
 }
-
 export function printSessionReport(session) {
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
   const sweat     = parseFloat(session.sweat_rate_lh ?? 0);
@@ -57,7 +52,6 @@ export function printSessionReport(session) {
   const typeLabel = { training: 'Treino', match: 'Jogo', recovery: 'Recuperação' }[session.session_type] ?? 'Sessão';
   const recoveryMl = deficitMl > 0 ? Math.round(deficitMl * 1.5) : null;
   const recoveryH  = deficitMl > 0 ? Math.max(8, Math.round(deficitMl / 200)) : 8;
-
   // Weight variation in percentage
   const hasWeightVariation = session.pre_weight_kg && session.post_weight_kg;
   const weightLossKg = hasWeightVariation ? session.pre_weight_kg - session.post_weight_kg : 0;
@@ -66,17 +60,14 @@ export function printSessionReport(session) {
   const dateStr = session.ended_at 
     ? new Date(session.ended_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     : new Date(session.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-
   const intColor = intensityColor(intensity);
   const sweatClass = sweat >= 1.5 ? 'alert' : sweat >= 0.8 ? 'warn' : 'ok';
-
   const html = `<!DOCTYPE html><html lang="pt-BR"><head>${base}<title>Relatório de Sessão — ${dateStr}</title></head><body>
     ${logoHtml()}
     <hr class="divider"/>
     <span class="tag" style="background:${intColor}20;color:${intColor}">${intensity.toUpperCase()}</span>
     <h1>Relatório Pós-Sessão<br/>${typeLabel}</h1>
     <p class="meta">${dateStr} · ${duration > 0 ? (Math.floor(duration/60) > 0 ? Math.floor(duration/60)+'h ' : '') + (duration%60 > 0 ? duration%60+'min' : '') : '—'} · SweatTrack Clinical Intelligence</p>
-
     <div class="section-title">Métricas Fisiológicas</div>
     <div class="grid">
       <div class="card highlight">
@@ -90,7 +81,6 @@ export function printSessionReport(session) {
         <div class="sub ${deficitMl > 2000 ? 'alert' : 'ok'}">${deficitMl > 2000 ? 'Elevado' : deficitMl > 0 ? 'Aceitável' : ''}</div>
       </div>
     </div>
-
     ${hasWeightVariation ? `
     <div class="section-title">Variação de Peso Corporal</div>
     <div class="grid-3">
@@ -109,7 +99,6 @@ export function printSessionReport(session) {
       <div class="card"><div class="label">Pré-Treino</div><div class="value">${session.pre_weight_kg ?? '—'} kg</div></div>
       <div class="card"><div class="label">Pós-Treino</div><div class="value">${session.post_weight_kg ?? '—'} kg</div></div>
     </div>` : ''}
-
     ${session.symptoms && Array.isArray(session.symptoms) && session.symptoms.length > 0 ? `
     <div class="section-title">Sintomas Registrados</div>
     <div class="grid">
@@ -117,44 +106,35 @@ export function printSessionReport(session) {
         <div class="value ok" style="font-size:14px; color:#C41E3A">${session.symptoms.join(', ')}</div>
       </div>
     </div>` : ''}
-
     <div class="section-title">Protocolo de Recuperação</div>
     <div class="step"><div class="step-num">1</div><div class="step-body"><div class="title">Reidratação Imediata</div><div class="desc">${recoveryMl ? `Consumir ${recoveryMl}ml de fluidos nas próximas 4 horas (150% da perda de ${(deficitMl/1000).toFixed(2)}L).` : 'Manter hidratação regular pós-sessão com 500–800ml de fluidos.'}</div></div></div>
     <div class="step"><div class="step-num">2</div><div class="step-body"><div class="title">Reposição de Eletrólitos</div><div class="desc">Alimentação normal de reposição de eletrólitos é suficiente. Para exercícios acima de 60 minutos, considere bebidas isotônicas.</div></div></div>
     <div class="step"><div class="step-num">3</div><div class="step-body"><div class="title">Monitoramento de Urina</div><div class="desc">Acompanhe a coloração da urina até atingir o tom amarelo-claro (Padrão 1–2 na escala de WUTS).</div></div></div>
-
     <div class="recovery-box">
       <div class="kicker">Análise Biopsicossocial</div>
       <div class="headline">Recuperação estimada: ${recoveryH} horas</div>
       <div class="note">Baseado no déficit hídrico (${(deficitMl/1000).toFixed(2)}L) e intensidade ${intensity} da sessão.</div>
     </div>
-
     <div class="footer">Gerado pelo SweatTrack Clinical Intelligence · ${new Date().toLocaleDateString('pt-BR')} · Documento clínico confidencial</div>
-
     <script>window.onload=()=>{setTimeout(()=>window.print(),400)}<\/script>
   </body></html>`;
-
   const w = window.open('', '_blank', 'width=800,height=900');
   w.document.write(html);
   w.document.close();
 }
-
 export function printAnalyticsReport({ dashboard, history, trend, userName }) {
   const stats       = dashboard?.stats ?? {};
   const totalSessions = dashboard?.totalSessions ?? 0;
   const lastSession = dashboard?.lastSession ?? null;
   const monthly     = history?.monthly ?? [];
   const byIntensity = history?.byIntensity ?? [];
-
   const INTENSITY_LABEL = { baixa:'Baixa', moderada:'Moderada', alta:'Alta', variada:'Variada' };
-
   const html = `<!DOCTYPE html><html lang="pt-BR"><head>${base}<title>Relatório Analítico — SweatTrack</title></head><body>
     ${logoHtml()}
     <hr class="divider"/>
     <span class="tag" style="background:${RED}20;color:${RED}">Relatório Analítico</span>
     <h1>Análise de Desempenho</h1>
     <p class="meta">${userName ? userName+' · ' : ''}Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
-
     <div class="section-title">Sumário Geral</div>
     <div class="grid">
       <div class="card highlight">
@@ -174,7 +154,6 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
         <div class="value alert">-${stats.avg_weight_loss_pct ? parseFloat(stats.avg_weight_loss_pct).toFixed(1)+'%' : '—'}</div>
       </div>
     </div>
-
     ${byIntensity.length > 0 ? `
     <div class="section-title">Distribuição por Intensidade</div>
     <div class="grid">
@@ -185,7 +164,6 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
           <div class="sub">Suor médio: ${r.avg_sweat ? parseFloat(r.avg_sweat).toFixed(2)+' L/h' : '—'}</div>
         </div>`).join('')}
     </div>` : ''}
-
     ${monthly.length > 0 ? `
     <div class="section-title">Histórico Mensal</div>
     <table style="width:100%;border-collapse:collapse;font-size:12px">
@@ -205,7 +183,6 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
           </tr>`).join('')}
       </tbody>
     </table>` : ''}
-
     ${lastSession ? `
     <div class="section-title">Última Sessão Registrada</div>
     <div class="grid">
@@ -218,11 +195,105 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
         <div class="value">${lastSession.hydric_deficit_ml ? (Math.abs(lastSession.hydric_deficit_ml)/1000).toFixed(2)+' L' : '—'}</div>
       </div>
     </div>` : ''}
-
     <div class="footer">Gerado pelo SweatTrack Clinical Intelligence · ${new Date().toLocaleDateString('pt-BR')} · Documento clínico confidencial</div>
     <script>window.onload=()=>{setTimeout(()=>window.print(),400)}<\/script>
   </body></html>`;
-
+  const w = window.open('', '_blank', 'width=800,height=900');
+  w.document.write(html);
+  w.document.close();
+}
+export function printTeamReport(teamData) {
+  const { name, description, coach_name, coach_email, members } = teamData;
+  
+  // Calculate team-wide summary metrics from members
+  const validSweatRates = members.filter(m => m.avg_sweat_rate !== null).map(m => parseFloat(m.avg_sweat_rate));
+  const avgSweatRate = validSweatRates.length > 0
+    ? (validSweatRates.reduce((a, b) => a + b, 0) / validSweatRates.length).toFixed(2)
+    : null;
+  const validWeightLoss = members.filter(m => m.avg_weight_loss_pct !== null).map(m => parseFloat(m.avg_weight_loss_pct));
+  const avgWeightLoss = validWeightLoss.length > 0
+    ? (validWeightLoss.reduce((a, b) => a + b, 0) / validWeightLoss.length).toFixed(1)
+    : null;
+  const totalCompletedSessions = members.reduce((sum, m) => sum + (m.total_sessions || 0), 0);
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head>${base}<title>Relatório de Equipe — ${name}</title></head><body>
+    <div class="logo">
+      <img src="${window.location.origin}/Full-Logo.svg" onerror="this.style.display='none'" style="height: 36px;"/>
+    </div>
+    <hr class="divider"/>
+    <span class="tag" style="background:${RED}20;color:${RED}">Relatório Desempenho Coletivo</span>
+    <h1>Relatório de Equipe: ${name}</h1>
+    <p class="meta">Treinador: ${coach_name} (${coach_email}) · Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
+    ${description ? `<div class="recovery-box" style="margin-top:0;margin-bottom:20px;background:#f9f9f9;border-color:#e5e5e5;padding:12px 16px;">
+      <div class="kicker" style="color:#666">Descrição da Equipe</div>
+      <div style="font-size:12px;color:#444;line-height:1.4">${description}</div>
+    </div>` : ''}
+    <div class="section-title">Estatísticas Gerais da Equipe</div>
+    <div class="grid">
+      <div class="card highlight">
+        <div class="label">Taxa de Sudorese Média</div>
+        <div class="value alert">${avgSweatRate ? avgSweatRate + ' L/h' : '—'}</div>
+        <div class="sub alert">Média dos atletas ativos</div>
+      </div>
+      <div class="card">
+        <div class="label">Perda de Peso Média por Treino</div>
+        <div class="value ${avgWeightLoss && parseFloat(avgWeightLoss) > 2 ? 'alert' : 'ok'}">${avgWeightLoss ? '-' + avgWeightLoss + '%' : '—'}</div>
+        <div class="sub ${avgWeightLoss && parseFloat(avgWeightLoss) > 2 ? 'alert' : 'ok'}">${avgWeightLoss && parseFloat(avgWeightLoss) > 2 ? 'Risco de Desidratação Alto' : 'Risco Controlado'}</div>
+      </div>
+      <div class="card">
+        <div class="label">Total de Atletas</div>
+        <div class="value">${members.length}</div>
+        <div class="sub">Vínculo confirmado</div>
+      </div>
+      <div class="card">
+        <div class="label">Sessões Concluídas</div>
+        <div class="value">${totalCompletedSessions}</div>
+        <div class="sub">Dados acumulados</div>
+      </div>
+    </div>
+    <div class="section-title">Desempenho Individual dos Atletas</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px">
+      <thead><tr style="background:#f5f5f5;border-bottom:2px solid #e5e5e5">
+        <th style="padding:10px 8px;text-align:left;font-weight:bold;color:#444">Atleta</th>
+        <th style="padding:10px 8px;text-align:left;font-weight:bold;color:#444">Esporte/Posição</th>
+        <th style="padding:10px 8px;text-align:center;font-weight:bold;color:#444">Sessões</th>
+        <th style="padding:10px 8px;text-align:center;font-weight:bold;color:#444">Suor Médio</th>
+        <th style="padding:10px 8px;text-align:center;font-weight:bold;color:#444">Déficit Médio</th>
+        <th style="padding:10px 8px;text-align:center;font-weight:bold;color:#444">Perda Peso</th>
+        <th style="padding:10px 8px;text-align:right;font-weight:bold;color:#444">Último Treino</th>
+      </tr></thead>
+      <tbody>
+        ${members.map((m, i) => {
+          const sweat = m.avg_sweat_rate ? parseFloat(m.avg_sweat_rate).toFixed(2) + ' L/h' : '—';
+          const deficit = m.avg_hydric_deficit ? (Math.abs(m.avg_hydric_deficit) / 1000).toFixed(2) + ' L' : '—';
+          const weightLoss = m.avg_weight_loss_pct ? '-' + parseFloat(m.avg_weight_loss_pct).toFixed(1) + '%' : '—';
+          const lastDate = m.last_session_at
+            ? new Date(m.last_session_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+            : '—';
+          const lastSweat = m.last_sweat_rate ? parseFloat(m.last_sweat_rate).toFixed(2) + ' L/h' : '';
+          const lastStr = lastDate !== '—' && lastSweat ? `${lastDate} (${lastSweat})` : lastDate;
+          const isHighRisk = m.avg_weight_loss_pct && parseFloat(m.avg_weight_loss_pct) > 2;
+          return `
+            <tr style="border-bottom:1px solid #eee; background: ${isHighRisk ? '#fff5f7' : 'transparent'}">
+              <td style="padding:10px 8px;text-align:left;vertical-align:middle">
+                <div style="font-weight:bold;color:#111">${m.name}</div>
+                <div style="font-size:9px;color:#666">${m.email}</div>
+              </td>
+              <td style="padding:10px 8px;text-align:left;vertical-align:middle;color:#444">
+                ${m.sport || m.position ? `${m.sport || ''} ${m.position ? `(${m.position})` : ''}` : '—'}
+              </td>
+              <td style="padding:10px 8px;text-align:center;vertical-align:middle;color:#111">${m.total_sessions}</td>
+              <td style="padding:10px 8px;text-align:center;vertical-align:middle;font-weight:bold;color:${m.avg_sweat_rate && parseFloat(m.avg_sweat_rate) >= 1.5 ? RED : '#111'}">${sweat}</td>
+              <td style="padding:10px 8px;text-align:center;vertical-align:middle;color:#111">${deficit}</td>
+              <td style="padding:10px 8px;text-align:center;vertical-align:middle;font-weight:bold;color:${isHighRisk ? RED : '#059669'}">${weightLoss}</td>
+              <td style="padding:10px 8px;text-align:right;vertical-align:middle;color:#555">${lastStr}</td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+    <div class="footer">Gerado pelo SweatTrack Clinical Intelligence · ${new Date().toLocaleDateString('pt-BR')} · Documento clínico confidencial</div>
+    <script>window.onload=()=>{setTimeout(()=>window.print(),400)}<\/script>
+  </body></html>`;
   const w = window.open('', '_blank', 'width=800,height=900');
   w.document.write(html);
   w.document.close();

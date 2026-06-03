@@ -696,3 +696,63 @@ exports.searchTeams = async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar equipes' });
   }
 };
+
+// Obter relatório consolidado da equipe (Apenas treinadores/admins)
+exports.getTeamReport = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Buscar detalhes da equipe
+    const [teams] = await db.query(
+      `SELECT t.*, u.name AS coach_name, u.email AS coach_email
+       FROM teams t
+       JOIN users u ON t.coach_id = u.id
+       WHERE t.id = ?`,
+      [id]
+    );
+
+    if (!teams.length) {
+      return res.status(404).json({ error: 'Equipe não encontrada' });
+    }
+
+    const team = teams[0];
+
+    // Verificar permissão (apenas o treinador da equipe ou admin)
+    if (team.coach_id !== req.userId && req.userRole !== 'admin') {
+      return res.status(403).json({ error: 'Acesso negado: apenas o treinador desta equipe pode exportar o relatório.' });
+    }
+
+    // Buscar atletas vinculados com suas estatísticas agregadas
+    const [members] = await db.query(
+      `SELECT 
+         u.id, 
+         u.name, 
+         u.email, 
+         ap.sport, 
+         ap.position,
+         COUNT(s.id) AS total_sessions,
+         AVG(s.sweat_rate_lh) AS avg_sweat_rate,
+         AVG(s.hydric_deficit_ml) AS avg_hydric_deficit,
+         AVG(s.duration_minutes) AS avg_duration,
+         AVG(CASE WHEN s.pre_weight_kg > 0 AND s.post_weight_kg > 0 THEN ((s.pre_weight_kg - s.post_weight_kg) / s.pre_weight_kg) * 100 ELSE NULL END) AS avg_weight_loss_pct,
+         MAX(s.ended_at) AS last_session_at,
+         (SELECT s2.sweat_rate_lh FROM sessions s2 WHERE s2.user_id = u.id AND s2.status = 'completed' ORDER BY s2.ended_at DESC LIMIT 1) AS last_sweat_rate
+       FROM users u
+       JOIN team_members tm ON tm.athlete_id = u.id
+       LEFT JOIN athlete_profiles ap ON ap.user_id = u.id
+       LEFT JOIN sessions s ON s.user_id = u.id AND s.status = 'completed'
+       WHERE tm.team_id = ? AND tm.status = 'accepted'
+       GROUP BY u.id, ap.sport, ap.position
+       ORDER BY u.name ASC`,
+      [id]
+    );
+
+    res.json({
+      ...team,
+      members
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao gerar relatório da equipe' });
+  }
+};

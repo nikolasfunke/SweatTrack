@@ -5,7 +5,8 @@ import {
   Plus, Users, Search, UserPlus, Check, X,
   ChevronRight, Trash2, Mail, Compass, ShieldCheck,
   AlertCircle, ArrowRight, Settings, LogOut, Eye,
-  Info, Loader2, UserCheck, UserMinus, ShieldAlert
+  Info, Loader2, UserCheck, UserMinus, ShieldAlert,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { teamApi } from '../services/api';
@@ -17,6 +18,7 @@ import Badge from '../components/ui/Badge';
 import Input from '../components/ui/Input';
 import Modal from '../components/ui/Modal';
 import { useToast } from '../components/ui/Toast';
+import { printTeamReport } from '../utils/printReport';
 
 const stagger = { animate: { transition: { staggerChildren: 0.05 } } };
 const fadeUp = { initial: { opacity: 0, y: 15 }, animate: { opacity: 1, y: 0 } };
@@ -47,6 +49,7 @@ export default function Teams() {
   const [deletingTeam, setDeletingTeam] = useState(false);
   const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(null); // stores { teamId, athleteId, name }
   const [removingMember, setRemovingMember] = useState(false);
+  const [exportingReport, setExportingReport] = useState(false);
 
   // Athlete-specific state
   const [searchTerm, setSearchTerm] = useState('');
@@ -198,6 +201,20 @@ export default function Teams() {
       toast('Erro ao remover atleta', 'error');
     } finally {
       setRemovingMember(false);
+    }
+  };
+
+  const handleExportReport = async () => {
+    if (!selectedTeam?.id) return;
+    setExportingReport(true);
+    try {
+      const { data } = await teamApi.getReport(selectedTeam.id);
+      printTeamReport(data);
+      toast('Relatório da equipe gerado com sucesso!', 'success');
+    } catch (err) {
+      toast(err.response?.data?.error || 'Erro ao exportar relatório da equipe', 'error');
+    } finally {
+      setExportingReport(false);
     }
   };
 
@@ -368,15 +385,25 @@ export default function Teams() {
                                 {selectedTeamDetails.description || 'Sem descrição cadastrada para esta equipe.'}
                               </p>
                             </div>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => setShowDeleteTeamModal(true)}
-                              icon={<Trash2 size={13} />}
-                              className="self-start sm:self-center"
-                            >
-                              Excluir Equipe
-                            </Button>
+                            <div className="flex items-center gap-2 self-start sm:self-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleExportReport}
+                                loading={exportingReport}
+                                icon={<Download size={13} />}
+                              >
+                                Exportar Relatório
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => setShowDeleteTeamModal(true)}
+                                icon={<Trash2 size={13} />}
+                              >
+                                Excluir Equipe
+                              </Button>
+                            </div>
                           </div>
 
                           {/* Members List */}

@@ -63,6 +63,7 @@ export default function ActiveMonitoring() {
   const [postWeight, setPostWeight] = useState('');
   const [intensity, setIntensity] = useState('moderada');
   const [finishing, setFinishing] = useState(false);
+  const [symptoms, setSymptoms] = useState([]);
   const [ambientTemp, setAmbientTemp] = useState(null);
   const [geoStatus, setGeoStatus] = useState('idle');
   const [timerMode, setTimerMode] = useState('auto'); // 'auto' | 'manual'
@@ -166,6 +167,7 @@ export default function ActiveMonitoring() {
         durationMinutes: getFinalDurationMinutes(),
         ambientTemp: ambientTemp ?? undefined,
         intensity,
+        symptoms,
       });
       // Clear all persisted session data after session ends
       localStorage.removeItem(keyStart);
@@ -468,6 +470,29 @@ export default function ActiveMonitoring() {
                   }`}
                 >
                   {v}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="label">Sintomas Pós-Sessão</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                { id: 'Fadiga', label: 'Fadiga', emoji: '🥱' },
+                { id: 'Cãibra', label: 'Cãibra', emoji: '⚡' },
+                { id: 'Gastrointestinal', label: 'Gastrointestinal', emoji: '🤢' },
+              ].map((sym) => (
+                <button
+                  key={sym.id}
+                  type="button"
+                  onClick={() => setSymptoms((prev) => prev.includes(sym.id) ? prev.filter(s => s !== sym.id) : [...prev, sym.id])}
+                  className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 ${symptoms.includes(sym.id)
+                    ? 'bg-rose-500/15 border-rose-500/40 text-rose-300 shadow-sm'
+                    : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                  }`}
+                >
+                  <span className="text-base">{sym.emoji}</span>
+                  {sym.label}
                 </button>
               ))}
             </div>

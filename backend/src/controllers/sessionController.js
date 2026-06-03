@@ -145,7 +145,7 @@ exports.updateTemp = async (req, res) => {
 
 exports.finish = async (req, res) => {
   try {
-    const { postWeightKg, durationMinutes, internalTemp, ambientTemp, intensity } = req.body;
+    const { postWeightKg, durationMinutes, internalTemp, ambientTemp, intensity, symptoms } = req.body;
     const normalizedPostWeight = postWeightKg === null || postWeightKg === undefined || postWeightKg === ''
       ? null
       : parseFloat(postWeightKg);
@@ -169,13 +169,15 @@ exports.finish = async (req, res) => {
        sweat_rate_lh = ?, hydric_deficit_ml = ?,
        internal_temp = COALESCE(?, internal_temp),
        ambient_temp = COALESCE(?, ambient_temp),
-       intensity = COALESCE(?, intensity)
+       intensity = COALESCE(?, intensity),
+       symptoms = ?
        WHERE id = ? AND user_id = ?`,
       [
         normalizedPostWeight, durationMinutes,
         metrics.sweatRateLh ?? null, metrics.hydricDeficitMl ?? null,
         internalTemp || null, ambientTemp || null,
         intensity || null,
+        symptoms ? JSON.stringify(symptoms) : null,
         req.params.id, req.userId,
       ]
     );

@@ -110,6 +110,14 @@ export function printSessionReport(session) {
       <div class="card"><div class="label">Pós-Treino</div><div class="value">${session.post_weight_kg ?? '—'} kg</div></div>
     </div>` : ''}
 
+    ${session.symptoms && Array.isArray(session.symptoms) && session.symptoms.length > 0 ? `
+    <div class="section-title">Sintomas Registrados</div>
+    <div class="grid">
+      <div class="card" style="grid-column: span 2;">
+        <div class="value ok" style="font-size:14px; color:#C41E3A">${session.symptoms.join(', ')}</div>
+      </div>
+    </div>` : ''}
+
     <div class="section-title">Protocolo de Recuperação</div>
     <div class="step"><div class="step-num">1</div><div class="step-body"><div class="title">Reidratação Imediata</div><div class="desc">${recoveryMl ? `Consumir ${recoveryMl}ml de fluidos nas próximas 4 horas (150% da perda de ${(deficitMl/1000).toFixed(2)}L).` : 'Manter hidratação regular pós-sessão com 500–800ml de fluidos.'}</div></div></div>
     <div class="step"><div class="step-num">2</div><div class="step-body"><div class="title">Reposição de Eletrólitos</div><div class="desc">Alimentação normal de reposição de eletrólitos é suficiente. Para exercícios acima de 60 minutos, considere bebidas isotônicas.</div></div></div>

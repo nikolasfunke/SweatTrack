@@ -138,6 +138,23 @@ function SessionDetailContent({ session, onClose, onDeleted }) {
         </div>
       )}
 
+      {/* Symptoms */}
+      {session.symptoms && Array.isArray(session.symptoms) && session.symptoms.length > 0 && (
+        <div className="bg-surface-2 rounded-2xl p-3 flex flex-col gap-2">
+          <div className="flex items-center gap-1.5">
+            <Activity size={14} className="text-rose-400" />
+            <p className="text-[10px] text-white/40 font-medium uppercase tracking-widest">Sintomas Registrados</p>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {session.symptoms.map((sym) => (
+              <span key={sym} className="text-xs font-bold bg-rose-500/15 text-rose-300 border border-rose-500/20 px-2.5 py-1 rounded-lg">
+                {sym}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Weight loss alert */}
       {isWeightAlert && (
         <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-3 flex items-start gap-2">

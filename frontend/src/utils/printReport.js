@@ -32,6 +32,22 @@ const base = `
     .recovery-box .note{font-size:11px;color:#666;margin-top:4px}
     .footer{margin-top:32px;padding-top:12px;border-top:1px solid #e5e5e5;text-align:center;font-size:10px;color:#aaa}
     .alert{color:#C41E3A} .warn{color:#d97706} .ok{color:#059669}
+    .ai-section{margin-top:24px;page-break-inside:avoid}
+    .ai-section .section-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+    .ai-section .section-header .sparkle{font-size:16px}
+    .ai-section .section-header .title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:${RED}}
+    .ai-topic{border:1.5px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:12px;page-break-inside:avoid}
+    .ai-topic .topic-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0f0f0}
+    .ai-topic .topic-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .ai-topic .topic-name{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${DARK}}
+    .ai-topic .topic-content{font-size:12px;color:#333;line-height:1.7}
+    .ai-topic .topic-content h1,.ai-topic .topic-content h2,.ai-topic .topic-content h3{font-size:13px;font-weight:800;color:${DARK};margin:12px 0 6px}
+    .ai-topic .topic-content p{margin:6px 0}
+    .ai-topic .topic-content ul,.ai-topic .topic-content ol{margin:6px 0;padding-left:20px}
+    .ai-topic .topic-content li{margin:3px 0}
+    .ai-topic .topic-content strong{font-weight:800;color:${DARK}}
+    .ai-topic .topic-content em{font-style:italic;color:#555}
+    .ai-disclaimer{text-align:center;font-size:9px;color:#aaa;margin-top:12px;padding:8px;border:1px dashed #ddd;border-radius:8px}
     @media print{body{padding:20px}button{display:none!important}}
   </style>
 `;
@@ -44,6 +60,69 @@ function logoHtml() {
 function intensityColor(v) {
   return { baixa: '#059669', moderada: '#d97706', alta: '#C41E3A', variada: '#7c3aed' }[v] ?? RED;
 }
+
+/* Lightweight markdown → HTML (handles headers, bold, italic, lists, paragraphs) */
+function markdownToHtml(md) {
+  if (!md) return '';
+  let html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\.\s(.+)$/gm, '<li>$1</li>');
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul>$1</ul>');
+  // Wrap remaining loose text lines in <p>
+  html = html.split('\n').map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    if (/^<(h[1-3]|ul|ol|li|p)/.test(trimmed)) return trimmed;
+    return `<p>${trimmed}</p>`;
+  }).join('\n');
+  return html;
+}
+
+/* Builds the AI analysis HTML block for the PDF */
+function aiSectionHtml(aiAnalysis) {
+  const analysis = typeof aiAnalysis === 'string' ? JSON.parse(aiAnalysis) : aiAnalysis;
+  if (!analysis) return '';
+
+  const topics = [
+    { id: 'overview',     label: 'Visão Geral',  icon: '📊', bg: '#EFF6FF', border: '#BFDBFE', iconBg: '#DBEAFE' },
+    { id: 'recovery',     label: 'Recuperação',   icon: '💧', bg: '#F0FDF4', border: '#BBF7D0', iconBg: '#DCFCE7' },
+    { id: 'improvements', label: 'Melhorias',     icon: '🎯', bg: '#FFF7ED', border: '#FED7AA', iconBg: '#FFEDD5' },
+  ];
+
+  const rendered = topics
+    .filter(t => analysis[t.id])
+    .map(t => `
+      <div class="ai-topic" style="border-color:${t.border};background:${t.bg}">
+        <div class="topic-header" style="border-bottom-color:${t.border}">
+          <div class="topic-icon" style="background:${t.iconBg}">${t.icon}</div>
+          <div class="topic-name">${t.label}</div>
+        </div>
+        <div class="topic-content">${markdownToHtml(analysis[t.id])}</div>
+      </div>
+    `).join('');
+
+  if (!rendered) return '';
+
+  return `
+    <div class="ai-section">
+      <hr class="divider"/>
+      <div class="section-header">
+        <span class="sparkle">✨</span>
+        <span class="title">Análise Assistida por IA</span>
+      </div>
+      ${rendered}
+      <div class="ai-disclaimer">⚠️ Conteúdo gerado por Inteligência Artificial a partir de dados brutos. Pode conter imprecisões. Consulte um profissional de saúde.</div>
+    </div>
+  `;
+}
+
 export function printSessionReport(session) {
   const deficitMl = Math.abs(session.hydric_deficit_ml ?? 0);
   const sweat     = parseFloat(session.sweat_rate_lh ?? 0);
@@ -115,6 +194,7 @@ export function printSessionReport(session) {
       <div class="headline">Recuperação estimada: ${recoveryH} horas</div>
       <div class="note">Baseado no déficit hídrico (${(deficitMl/1000).toFixed(2)}L) e intensidade ${intensity} da sessão.</div>
     </div>
+    ${session.ai_analysis ? aiSectionHtml(session.ai_analysis) : ''}
     <div class="footer">Gerado pelo SweatTrack Clinical Intelligence · ${new Date().toLocaleDateString('pt-BR')} · Documento clínico confidencial</div>
     <script>window.onload=()=>{setTimeout(()=>window.print(),400)}<\/script>
   </body></html>`;

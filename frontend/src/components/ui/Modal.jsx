@@ -32,7 +32,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
 
           {/* Panel */}
           <motion.div
-            className={`relative w-full ${sizes[size]} bg-surface-1 border border-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden z-10`}
+            className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col bg-surface-1 border border-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden z-10`}
             initial={{ y: 60, opacity: 0, scale: 0.97 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 40, opacity: 0, scale: 0.97 }}
@@ -55,7 +55,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
               </div>
             )}
 
-            <div className="p-5">{children}</div>
+            <div className="p-5 overflow-y-auto min-h-0 flex-1">{children}</div>
           </motion.div>
         </motion.div>
       )}

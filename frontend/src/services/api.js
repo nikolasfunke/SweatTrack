@@ -43,6 +43,7 @@ export const sessionApi = {
   logFluid: (id, data) => api.post(`/sessions/${id}/fluid`, data),
   updateTemp: (id, data) => api.patch(`/sessions/${id}/temp`, data),
   finish: (id, data) => api.post(`/sessions/${id}/finish`, data),
+  analyze: (id, topic) => api.post(`/sessions/${id}/analyze`, { topic }),
   delete: (id) => api.delete(`/sessions/${id}`),
 };
 

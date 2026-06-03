@@ -12,6 +12,7 @@ router.post('/:id/start', ctrl.start);
 router.post('/:id/fluid', ctrl.logFluid);
 router.patch('/:id/temp', ctrl.updateTemp);
 router.post('/:id/finish', ctrl.finish);
+router.post('/:id/analyze', ctrl.analyze);
 router.delete('/:id', ctrl.delete);
 
 module.exports = router;

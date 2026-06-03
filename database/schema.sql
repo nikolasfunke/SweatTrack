@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   sweat_rate_lh        DECIMAL(4,2),
   hydric_deficit_ml    INT,
   symptoms             JSON NULL,
+  ai_analysis          JSON NULL,
   -- Timestamps
   started_at           TIMESTAMP NULL,
   ended_at             TIMESTAMP NULL,

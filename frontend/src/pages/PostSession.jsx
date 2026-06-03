@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Trash2, AlertTriangle,
+  Activity, CloudSun, Droplets, Download, Scale, TrendingDown, Trash2, AlertTriangle, Sparkles, Loader2
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { sessionApi } from '../services/api';
 import { printSessionReport } from '../utils/printReport';
 import { ConfirmModal } from '../components/ui/Modal';
@@ -31,6 +32,8 @@ export default function PostSession() {
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [aiTopic, setAiTopic] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     sessionApi.getOne(id)
@@ -41,6 +44,14 @@ export default function PostSession() {
       })
       .finally(() => setLoading(false));
   }, [id, navigate, toast]);
+
+  useEffect(() => {
+    if (!session || aiTopic) return;
+    const analysisObj = (typeof session.ai_analysis === 'string' ? JSON.parse(session.ai_analysis) : session.ai_analysis) || {};
+    if (analysisObj['overview']) setAiTopic('overview');
+    else if (analysisObj['recovery']) setAiTopic('recovery');
+    else if (analysisObj['improvements']) setAiTopic('improvements');
+  }, [session, aiTopic]);
 
   if (loading) {
     return (
@@ -64,6 +75,26 @@ export default function PostSession() {
       navigate('/monitor', { replace: true });
     } finally {
       setDeleting(false);
+    }
+  }
+
+  async function handleAnalyze(topic) {
+    setAiTopic(topic);
+    const analysisObj = (typeof session.ai_analysis === 'string' ? JSON.parse(session.ai_analysis) : session.ai_analysis) || {};
+    if (analysisObj[topic]) {
+      return; // Already generated
+    }
+    setAiLoading(true);
+    try {
+      const res = await sessionApi.analyze(session.id, topic);
+      setSession(prev => {
+        const prevAnalysis = (typeof prev.ai_analysis === 'string' ? JSON.parse(prev.ai_analysis) : prev.ai_analysis) || {};
+        return { ...prev, ai_analysis: { ...prevAnalysis, [topic]: res.data.analysis } };
+      });
+    } catch (err) {
+      toast(err.response?.data?.error || 'Erro ao gerar análise por IA', 'error');
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -218,6 +249,55 @@ export default function PostSession() {
               </p>
             </div>
           )}
+
+          {/* AI Analysis Section */}
+          <Card glow>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles size={16} className="text-primary animate-pulse" />
+              <p className="text-sm font-black text-primary uppercase tracking-widest">Análise Assistida por IA</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mb-4">
+              {[
+                { id: 'overview', label: 'Visão Geral' },
+                { id: 'recovery', label: 'Recuperação' },
+                { id: 'improvements', label: 'Melhorias' }
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => handleAnalyze(t.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    aiTopic === t.id
+                      ? 'bg-primary/20 text-primary border border-primary/40'
+                      : 'bg-surface-2 text-white/50 hover:text-white/80 border border-border'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {aiTopic && (
+              <div className="bg-black/20 rounded-xl p-4 min-h-[100px]">
+                {aiLoading ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-2 text-white/40">
+                    <Loader2 size={20} className="animate-spin text-primary" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Gerando insights...</span>
+                  </div>
+                ) : (
+                  <div className="prose prose-invert prose-sm max-w-none text-white/80">
+                    <ReactMarkdown>
+                      {((typeof session.ai_analysis === 'string' ? JSON.parse(session.ai_analysis) : session.ai_analysis) || {})[aiTopic] || ''}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <p className="mt-4 text-[9px] text-white/30 uppercase tracking-widest text-center leading-relaxed">
+              ⚠️ Gerado por Inteligência Artificial a partir de dados brutos. Pode conter imprecisões. Consulte um especialista.
+            </p>
+          </Card>
 
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" onClick={() => navigate(-1)}>

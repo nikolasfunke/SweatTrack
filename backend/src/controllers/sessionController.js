@@ -197,3 +197,62 @@ exports.delete = async (req, res) => {
     res.status(500).json({ error: 'Erro ao deletar sessão' });
   }
 };
+
+exports.analyze = async (req, res) => {
+  try {
+    const { topic } = req.body;
+    const sessionId = req.params.id;
+
+    const [rows] = await db.query('SELECT * FROM sessions WHERE id = ?', [sessionId]);
+    if (!rows.length) return res.status(404).json({ error: 'Sessão não encontrada' });
+    const session = rows[0];
+
+    if (session.user_id !== req.userId && req.userRole !== 'admin' && req.userRole !== 'coach') {
+       return res.status(403).json({ error: 'Acesso negado' });
+    }
+
+    const analysisObj = (typeof session.ai_analysis === 'string' ? JSON.parse(session.ai_analysis) : session.ai_analysis) || {};
+    if (analysisObj[topic]) {
+       return res.json({ analysis: analysisObj[topic] });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+       return res.status(500).json({ error: 'A chave de API GEMINI_API_KEY não está configurada no backend.' });
+    }
+
+    const { GoogleGenAI } = require('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+    const dataStr = `
+Duração: ${session.duration_minutes || 0} min
+Intensidade: ${session.intensity || 'não informada'}
+Taxa de Sudorese: ${session.sweat_rate_lh || 0} L/h
+Déficit Hídrico: ${session.hydric_deficit_ml || 0} ml
+Sintomas: ${session.symptoms ? (Array.isArray(session.symptoms) ? session.symptoms.join(', ') : session.symptoms) : 'Nenhum'}
+Clima: ${session.ambient_temp ? session.ambient_temp + '°C' : 'não informado'}
+`;
+
+    let systemInstruction = "Você é um assistente especialista em ciência do esporte, fisiologia e hidratação. Baseie-se ESTRITAMENTE nos dados numéricos fornecidos. Seja direto, conciso, e forneça análises úteis para o atleta. Nunca invente dados. Nunca faça diagnósticos clínicos, apenas dê orientações de desempenho. Formate a resposta em Markdown limpo.";
+    let topicName = topic === 'recovery' ? 'Tempo estimado de recuperação e protocolo' : topic === 'improvements' ? 'O que o atleta pode melhorar' : 'Visão geral do treino';
+    let promptMsg = `Analise os seguintes dados do treino focando especificamente em '${topicName}':\n${dataStr}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: promptMsg,
+      config: {
+        systemInstruction,
+        temperature: 0.2
+      }
+    });
+
+    const generatedText = response.text;
+
+    analysisObj[topic] = generatedText;
+    await db.query('UPDATE sessions SET ai_analysis = ? WHERE id = ?', [JSON.stringify(analysisObj), sessionId]);
+
+    res.json({ analysis: generatedText });
+  } catch (err) {
+    console.error('AI Analysis Error:', err);
+    res.status(500).json({ error: 'Erro ao gerar análise por IA' });
+  }
+};

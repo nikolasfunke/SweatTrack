@@ -203,7 +203,15 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
   w.document.close();
 }
 export function printTeamReport(teamData) {
-  const { name, description, coach_name, coach_email, members } = teamData;
+  const { name, description, coach_name, coach_email, members, period } = teamData;
+
+  const periodLabels = {
+    all: 'Todo o histórico',
+    month: 'Últimos 30 dias',
+    week: 'Últimos 7 dias',
+    day: 'Últimas 24 horas'
+  };
+  const selectedPeriodLabel = periodLabels[period] || 'Todo o histórico';
   
   // Calculate team-wide summary metrics from members
   const validSweatRates = members.filter(m => m.avg_sweat_rate !== null).map(m => parseFloat(m.avg_sweat_rate));
@@ -222,7 +230,7 @@ export function printTeamReport(teamData) {
     <hr class="divider"/>
     <span class="tag" style="background:${RED}20;color:${RED}">Relatório Desempenho Coletivo</span>
     <h1>Relatório de Equipe: ${name}</h1>
-    <p class="meta">Treinador: ${coach_name} (${coach_email}) · Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
+    <p class="meta">Treinador: ${coach_name} (${coach_email}) · Período: ${selectedPeriodLabel} · Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
     ${description ? `<div class="recovery-box" style="margin-top:0;margin-bottom:20px;background:#f9f9f9;border-color:#e5e5e5;padding:12px 16px;">
       <div class="kicker" style="color:#666">Descrição da Equipe</div>
       <div style="font-size:12px;color:#444;line-height:1.4">${description}</div>

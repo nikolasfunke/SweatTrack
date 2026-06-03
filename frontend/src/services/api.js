@@ -59,7 +59,7 @@ export const teamApi = {
   list: () => api.get('/teams'),
   create: (data) => api.post('/teams', data),
   getOne: (id) => api.get(`/teams/${id}`),
-  getReport: (id) => api.get(`/teams/${id}/report`),
+  getReport: (id, period = 'all') => api.get(`/teams/${id}/report`, { params: { period } }),
   delete: (id) => api.delete(`/teams/${id}`),
   invite: (id, email) => api.post(`/teams/${id}/invite`, { email }),
   join: (id) => api.post(`/teams/${id}/join`),

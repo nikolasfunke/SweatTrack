@@ -700,6 +700,20 @@ exports.searchTeams = async (req, res) => {
 // Obter relatório consolidado da equipe (Apenas treinadores/admins)
 exports.getTeamReport = async (req, res) => {
   const { id } = req.params;
+  const period = req.query.period || 'all'; // 'day' | 'week' | 'month' | 'all'
+
+  let dateFilterMain = '';
+  let dateFilterSub = '';
+  if (period === 'day') {
+    dateFilterMain = ' AND s.ended_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+    dateFilterSub = ' AND s2.ended_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+  } else if (period === 'week') {
+    dateFilterMain = ' AND s.ended_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+    dateFilterSub = ' AND s2.ended_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+  } else if (period === 'month') {
+    dateFilterMain = ' AND s.ended_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+    dateFilterSub = ' AND s2.ended_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+  }
 
   try {
     // Buscar detalhes da equipe
@@ -736,11 +750,11 @@ exports.getTeamReport = async (req, res) => {
          AVG(s.duration_minutes) AS avg_duration,
          AVG(CASE WHEN s.pre_weight_kg > 0 AND s.post_weight_kg > 0 THEN ((s.pre_weight_kg - s.post_weight_kg) / s.pre_weight_kg) * 100 ELSE NULL END) AS avg_weight_loss_pct,
          MAX(s.ended_at) AS last_session_at,
-         (SELECT s2.sweat_rate_lh FROM sessions s2 WHERE s2.user_id = u.id AND s2.status = 'completed' ORDER BY s2.ended_at DESC LIMIT 1) AS last_sweat_rate
+         (SELECT s2.sweat_rate_lh FROM sessions s2 WHERE s2.user_id = u.id AND s2.status = 'completed' ${dateFilterSub} ORDER BY s2.ended_at DESC LIMIT 1) AS last_sweat_rate
        FROM users u
        JOIN team_members tm ON tm.athlete_id = u.id
        LEFT JOIN athlete_profiles ap ON ap.user_id = u.id
-       LEFT JOIN sessions s ON s.user_id = u.id AND s.status = 'completed'
+       LEFT JOIN sessions s ON s.user_id = u.id AND s.status = 'completed' ${dateFilterMain}
        WHERE tm.team_id = ? AND tm.status = 'accepted'
        GROUP BY u.id, ap.sport, ap.position
        ORDER BY u.name ASC`,
@@ -749,6 +763,7 @@ exports.getTeamReport = async (req, res) => {
 
     res.json({
       ...team,
+      period,
       members
     });
   } catch (err) {

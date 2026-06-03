@@ -50,6 +50,8 @@ export default function Teams() {
   const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(null); // stores { teamId, athleteId, name }
   const [removingMember, setRemovingMember] = useState(false);
   const [exportingReport, setExportingReport] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportPeriod, setExportPeriod] = useState('all'); // 'all' | 'month' | 'week' | 'day'
 
   // Athlete-specific state
   const [searchTerm, setSearchTerm] = useState('');
@@ -208,8 +210,9 @@ export default function Teams() {
     if (!selectedTeam?.id) return;
     setExportingReport(true);
     try {
-      const { data } = await teamApi.getReport(selectedTeam.id);
+      const { data } = await teamApi.getReport(selectedTeam.id, exportPeriod);
       printTeamReport(data);
+      setShowExportModal(false);
       toast('Relatório da equipe gerado com sucesso!', 'success');
     } catch (err) {
       toast(err.response?.data?.error || 'Erro ao exportar relatório da equipe', 'error');
@@ -389,8 +392,7 @@ export default function Teams() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={handleExportReport}
-                                loading={exportingReport}
+                                onClick={() => setShowExportModal(true)}
                                 icon={<Download size={13} />}
                               >
                                 Exportar Relatório
@@ -938,6 +940,47 @@ export default function Teams() {
             </Button>
             <Button variant="danger" loading={leavingTeam} onClick={handleLeaveTeam}>
               Sim, Sair da Equipe
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* EXPORT TEAM REPORT MODAL (Coach) */}
+      <Modal open={showExportModal} onClose={() => setShowExportModal(false)} title="Exportar Relatório da Equipe">
+        <div className="space-y-4">
+          <p className="text-xs text-white/50">
+            Selecione o intervalo de tempo para consolidar os dados das sessões dos atletas no relatório.
+          </p>
+
+          <div className="space-y-2">
+            {[
+              { val: 'all', label: 'Todo o histórico', desc: 'Consolidar todas as sessões registradas' },
+              { val: 'month', label: 'Últimos 30 dias (Mês)', desc: 'Consolidar sessões dos últimos 30 dias' },
+              { val: 'week', label: 'Últimos 7 dias (Semana)', desc: 'Consolidar sessões dos últimos 7 dias' },
+              { val: 'day', label: 'Últimas 24 horas (Dia)', desc: 'Consolidar sessões do último dia' },
+            ].map(({ val, label, desc }) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => setExportPeriod(val)}
+                className={`w-full p-3 rounded-xl border text-left transition-all ${
+                  exportPeriod === val
+                    ? 'bg-primary/10 border-primary/40 text-white'
+                    : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                }`}
+              >
+                <div className="font-bold text-sm text-white">{label}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">{desc}</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <Button variant="outline" onClick={() => setShowExportModal(false)} disabled={exportingReport}>
+              Cancelar
+            </Button>
+            <Button variant="primary" loading={exportingReport} onClick={handleExportReport} icon={<Download size={14} />}>
+              Gerar Relatório
             </Button>
           </div>
         </div>

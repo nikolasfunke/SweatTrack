@@ -218,13 +218,14 @@ export default function VerifyEmail() {
 
         {/* Sair */}
         {!success && (
-          <div className="mt-8 text-center">
+          <div className="mt-8 pt-6 border-t border-border/50 text-center">
+            <p className="text-xs text-white/40 mb-3">Não tem acesso ao e-mail informado?</p>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 text-xs text-white/25 hover:text-white/50 transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white/90 hover:bg-white/5 transition-all px-4 py-2 rounded-xl border border-border/50 hover:border-border"
             >
-              <LogOut size={12} />
-              Sair da conta
+              <LogOut size={14} />
+              Sair e usar outro e-mail
             </button>
           </div>
         )}

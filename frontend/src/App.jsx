@@ -52,6 +52,7 @@ function RequireAdmin({ children }) {
 function RedirectIfAuth({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <PageLoader />;
+  if (user && !user.isVerified) return <Navigate to="/verify-email" replace />;
   if (user) return <Navigate to="/dashboard" replace />;
   return children;
 }

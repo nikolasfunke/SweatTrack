@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/sessionController');
 const auth = require('../middleware/auth');
+const verified = require('../middleware/verified');
 const coachAccess = require('../middleware/coachAccess');
 
 router.use(auth);
+router.use(verified);
 router.get('/', coachAccess, ctrl.list);
 router.post('/', ctrl.create);
 router.get('/:id', ctrl.getOne);

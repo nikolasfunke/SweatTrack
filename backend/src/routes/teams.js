@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/teamController');
 const auth = require('../middleware/auth');
+const verified = require('../middleware/verified');
 
 router.use(auth);
+router.use(verified);
 
 router.post('/', ctrl.createTeam);
 router.get('/', ctrl.listTeams);

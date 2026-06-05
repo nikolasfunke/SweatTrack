@@ -9,16 +9,19 @@ USE sweattrack;
 -- Usuários
 -- ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  name          VARCHAR(150) NOT NULL,
-  email         VARCHAR(150) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  role          ENUM('athlete','nutritionist','coach','admin','doctor') NOT NULL DEFAULT 'athlete',
-  is_admin      TINYINT(1) NOT NULL DEFAULT 0,
-  clinic_name   VARCHAR(150),
-  avatar_url    VARCHAR(500),
-  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  id                   INT AUTO_INCREMENT PRIMARY KEY,
+  name                 VARCHAR(150) NOT NULL,
+  email                VARCHAR(150) NOT NULL UNIQUE,
+  password_hash        VARCHAR(255) NOT NULL,
+  role                 ENUM('athlete','nutritionist','coach','admin','doctor') NOT NULL DEFAULT 'athlete',
+  is_admin             TINYINT(1) NOT NULL DEFAULT 0,
+  is_verified          TINYINT(1) NOT NULL DEFAULT 0,
+  verification_code    VARCHAR(6) NULL,
+  verification_expires TIMESTAMP NULL,
+  clinic_name          VARCHAR(150),
+  avatar_url           VARCHAR(500),
+  created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- ─────────────────────────────────────────────

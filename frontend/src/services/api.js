@@ -31,6 +31,8 @@ export const authApi = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
   me: () => api.get('/auth/me'),
+  verifyEmail: (code) => api.post('/auth/verify', { code }),
+  resendVerification: () => api.post('/auth/resend-verification'),
 };
 
 // Sessions

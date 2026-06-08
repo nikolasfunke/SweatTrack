@@ -202,7 +202,7 @@ export function printSessionReport(session) {
   w.document.write(html);
   w.document.close();
 }
-export function printAnalyticsReport({ dashboard, history, trend, userName }) {
+export function printAnalyticsReport({ dashboard, history, trend, userName, periodLabel }) {
   const stats       = dashboard?.stats ?? {};
   const totalSessions = dashboard?.totalSessions ?? 0;
   const lastSession = dashboard?.lastSession ?? null;
@@ -214,7 +214,7 @@ export function printAnalyticsReport({ dashboard, history, trend, userName }) {
     <hr class="divider"/>
     <span class="tag" style="background:${RED}20;color:${RED}">Relatório Analítico</span>
     <h1>Análise de Desempenho</h1>
-    <p class="meta">${userName ? userName+' · ' : ''}Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
+    <p class="meta">${userName ? userName+' · ' : ''}${periodLabel ? 'Período: '+periodLabel+' · ' : ''}Gerado em ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })} · SweatTrack Clinical Intelligence</p>
     <div class="section-title">Sumário Geral</div>
     <div class="grid">
       <div class="card highlight">

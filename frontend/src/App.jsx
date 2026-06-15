@@ -6,6 +6,7 @@ import { PageLoader } from './components/ui/Spinner';
 
 const Login            = lazy(() => import('./pages/Login'));
 const Register         = lazy(() => import('./pages/Register'));
+const VerifyEmail      = lazy(() => import('./pages/VerifyEmail'));
 const Dashboard        = lazy(() => import('./pages/Dashboard'));
 const PreSession       = lazy(() => import('./pages/PreSession'));
 const ActiveMonitoring = lazy(() => import('./pages/ActiveMonitoring'));
@@ -19,11 +20,22 @@ const Settings         = lazy(() => import('./pages/Settings'));
 const AdminUsers       = lazy(() => import('./pages/AdminUsers'));
 const Teams            = lazy(() => import('./pages/Teams'));
 
+/** Usuário autenticado E verificado pode acessar rotas internas. */
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
   if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user.isVerified) return <Navigate to="/verify-email" replace />;
+  return children;
+}
+
+/** Usuário autenticado mas NÃO verificado pode acessar /verify-email. */
+function RequireUnverified({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <PageLoader />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.isVerified) return <Navigate to="/dashboard" replace />;
   return children;
 }
 
@@ -32,6 +44,7 @@ function RequireAdmin({ children }) {
   const location = useLocation();
   if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user.isVerified) return <Navigate to="/verify-email" replace />;
   if (!user.isAdmin) return <Navigate to="/dashboard" replace />;
   return children;
 }
@@ -39,6 +52,7 @@ function RequireAdmin({ children }) {
 function RedirectIfAuth({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <PageLoader />;
+  if (user && !user.isVerified) return <Navigate to="/verify-email" replace />;
   if (user) return <Navigate to="/dashboard" replace />;
   return children;
 }
@@ -53,6 +67,9 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login"    element={<RedirectIfAuth><Login /></RedirectIfAuth>} />
           <Route path="/register" element={<RedirectIfAuth><Register /></RedirectIfAuth>} />
+
+          {/* Verificação de e-mail */}
+          <Route path="/verify-email" element={<RequireUnverified><VerifyEmail /></RequireUnverified>} />
 
           {/* Protected */}
           <Route path="/dashboard"        element={<RequireAuth><Dashboard /></RequireAuth>} />

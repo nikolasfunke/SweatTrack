@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Droplets, Activity, StopCircle, Lightbulb, MapPin, CloudSun, Timer, Pencil } from 'lucide-react';
+import { Plus, Droplets, Activity, StopCircle, Lightbulb, MapPin, CloudSun, Timer, Pencil, AlertTriangle } from 'lucide-react';
 import { sessionApi } from '../services/api';
 import { useToast } from '../components/ui/Toast';
 import AppLayout from '../components/layout/AppLayout';
@@ -69,6 +69,7 @@ export default function ActiveMonitoring() {
   const [timerMode, setTimerMode] = useState('auto'); // 'auto' | 'manual'
   const [manualHours, setManualHours] = useState('');
   const [manualMinutes, setManualMinutes] = useState('');
+  const [preWeightKg, setPreWeightKg] = useState(null);
   const tickRef = useRef(null);
 
   useEffect(() => {
@@ -78,6 +79,12 @@ export default function ActiveMonitoring() {
     }, 1000);
     return () => clearInterval(tickRef.current);
   }, []);
+
+  useEffect(() => {
+    sessionApi.getOne(id)
+      .then(r => { if (r.data?.pre_weight_kg) setPreWeightKg(parseFloat(r.data.pre_weight_kg)); })
+      .catch(() => {});
+  }, [id]);
 
   // Fetch real ambient temperature from device location via Open-Meteo (no API key required)
   useEffect(() => {
@@ -151,6 +158,23 @@ export default function ActiveMonitoring() {
     }
     return Math.round(elapsed / 60);
   };
+
+  const sweatWarning = (() => {
+    if (!postWeight || !preWeightKg) return null;
+    const post = parseFloat(postWeight);
+    if (isNaN(post)) return null;
+    if (post > preWeightKg) {
+      return { type: 'error', msg: 'Peso pós-sessão maior que o pré-sessão. Verifique a pesagem.' };
+    }
+    const dur = getFinalDurationMinutes();
+    if (dur <= 0) return null;
+    const sweatLiters = (preWeightKg - post) + totalFluid / 1000;
+    const rateLh = sweatLiters / (dur / 60);
+    if (rateLh > 3.0) {
+      return { type: 'warn', msg: `Taxa estimada muito alta (${rateLh.toFixed(1)} L/h). Confirme a pesagem antes de finalizar.` };
+    }
+    return null;
+  })();
 
   const handleFinish = async () => {
     if (timerMode === 'manual') {
@@ -447,6 +471,16 @@ export default function ActiveMonitoring() {
             onChange={(e) => setPostWeight(e.target.value)}
             suffix="KG"
           />
+          {sweatWarning && (
+            <div className={`rounded-xl p-3 text-xs font-medium flex items-start gap-2 ${
+              sweatWarning.type === 'error'
+                ? 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
+                : 'bg-amber-500/10 border border-amber-500/30 text-amber-300'
+            }`}>
+              <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+              <span>{sweatWarning.msg} <span className="opacity-60">Você ainda pode finalizar normalmente.</span></span>
+            </div>
+          )}
           <div className="bg-surface-2 rounded-xl p-3 text-sm text-white/50">
             <p>Duração{timerMode === 'manual' ? ' (manual)' : ''}: <span className="text-white font-bold">
               {timerMode === 'manual'

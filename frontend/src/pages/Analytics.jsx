@@ -14,6 +14,7 @@ import AppLayout from '../components/layout/AppLayout';
 import Header from '../components/layout/Header';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Modal from '../components/ui/Modal';
 import WeeklyChart from '../components/charts/WeeklyChart';
 import HydrationGauge from '../components/charts/HydrationGauge';
 import { useToast } from '../components/ui/Toast';
@@ -71,6 +72,8 @@ export default function Analytics() {
   const [trend, setTrend] = useState([]);
   const [history, setHistory] = useState({ sessions: [], byIntensity: [], monthly: [] });
   const [loading, setLoading] = useState(true);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportPeriod, setExportPeriod] = useState('all');
 
   useEffect(() => {
     setLoading(true);
@@ -137,7 +140,7 @@ export default function Analytics() {
           <Button
             variant="ghost" size="sm"
             icon={<Download size={15} />}
-            onClick={() => printAnalyticsReport({ dashboard, history, trend, userName: dashboard?.athleteName || user?.name })}
+            onClick={() => setShowExportModal(true)}
           >
             Exportar
           </Button>
@@ -498,6 +501,61 @@ export default function Analytics() {
 
         </motion.div>
       </div>
+      <Modal open={showExportModal} onClose={() => setShowExportModal(false)} title="Exportar Relatório">
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs text-white/50 mb-3">Selecione o período que deseja incluir no relatório:</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'week', label: 'Última Semana' },
+                { id: 'month', label: 'Último Mês' },
+                { id: 'all', label: 'Todo Histórico' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setExportPeriod(opt.id)}
+                  className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all text-center ${
+                    exportPeriod === opt.id
+                      ? 'bg-primary/15 border-primary/40 text-white'
+                      : 'bg-surface-2 border-border text-white/40 hover:border-border-bright'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Button
+            variant="primary" size="xl"
+            icon={<Download size={15} />}
+            onClick={() => {
+              const periodLabel = { week: 'Última Semana', month: 'Último Mês', all: 'Todo o Histórico' }[exportPeriod];
+              const now = new Date();
+              const filteredMonthly = (() => {
+                if (exportPeriod === 'week') {
+                  const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7);
+                  return (history.monthly ?? []).filter(r => new Date(r.month_key + '-01') >= cutoff);
+                }
+                if (exportPeriod === 'month') {
+                  return (history.monthly ?? []).slice(-1);
+                }
+                return history.monthly;
+              })();
+              printAnalyticsReport({
+                dashboard,
+                history: { ...history, monthly: filteredMonthly },
+                trend,
+                userName: dashboard?.athleteName || user?.name,
+                periodLabel,
+              });
+              setShowExportModal(false);
+            }}
+          >
+            Gerar PDF
+          </Button>
+        </div>
+      </Modal>
     </AppLayout>
   );
 }

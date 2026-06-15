@@ -9,9 +9,8 @@ import Input from '../components/ui/Input';
 
 const FEATURES = [
   { icon: Droplets,  label: 'Monitoramento hídrico em tempo real' },
-  { icon: Activity,  label: 'Taxa de sudorese e déficit calórico' },
+  { icon: Activity,  label: 'Taxa de sudorese' },
   { icon: BarChart3, label: 'Relatórios clínicos exportáveis' },
-  { icon: Shield,    label: 'Protocolo Sweat-Track v1.1' },
 ];
 
 export default function Login() {
@@ -79,8 +78,8 @@ export default function Login() {
 
           {/* Logo */}
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
-              <Droplets size={30} className="text-white" strokeWidth={2.5} />
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg p-2">
+              <img src="/Half-Logo.png" alt="SweatTrack Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.25em]">Sweat</p>
@@ -106,7 +105,6 @@ export default function Login() {
 
           {/* Footer label */}
           <p className="hidden md:block text-white/30 text-[10px] font-bold uppercase tracking-widest mt-10">
-            PROTOCOLO SWEAT-TRACK v1.1
           </p>
         </div>
 

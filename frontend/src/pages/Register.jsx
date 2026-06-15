@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import Button from '../components/ui/Button';
@@ -14,7 +14,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirmPassword: '',
-    role: 'athlete', requestAdmin: false,
+    role: 'athlete',
   });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,6 @@ export default function Register() {
         email: form.email,
         password: form.password,
         role: form.role,
-        requestAdmin: form.role === 'coach' ? form.requestAdmin : undefined,
       });
       toast('Conta criada com sucesso!', 'success');
       navigate('/dashboard');
@@ -110,34 +109,7 @@ export default function Register() {
             icon={<Mail size={16} />}
             error={errors.email}
           />
-          {form.role === 'coach' && (
-            <button
-              type="button"
-              onClick={() => setForm((f) => ({ ...f, requestAdmin: !f.requestAdmin }))}
-              className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${
-                form.requestAdmin
-                  ? 'bg-primary/10 border-primary/40'
-                  : 'bg-surface-2 border-border hover:border-border-bright'
-              }`}
-            >
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                form.requestAdmin ? 'bg-primary border-primary' : 'border-white/20'
-              }`}>
-                {form.requestAdmin && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <Shield size={14} className={form.requestAdmin ? 'text-primary' : 'text-white/30'} />
-                  <p className={`text-sm font-semibold ${form.requestAdmin ? 'text-white' : 'text-white/50'}`}>
-                    Pedir para ser admin?
-                  </p>
-                </div>
-                <p className="text-[11px] text-white/30 mt-0.5">
-                  Um admin existente precisará aprovar sua solicitação.
-                </p>
-              </div>
-            </button>
-          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Senha"

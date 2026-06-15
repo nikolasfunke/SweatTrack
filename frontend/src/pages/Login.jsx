@@ -8,8 +8,8 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
 const FEATURES = [
-  { icon: Droplets,  label: 'Monitoramento hídrico em tempo real' },
-  { icon: Activity,  label: 'Taxa de sudorese' },
+  { icon: Droplets, label: 'Monitoramento hídrico em tempo real' },
+  { icon: Activity, label: 'Taxa de sudorese' },
   { icon: BarChart3, label: 'Relatórios clínicos exportáveis' },
 ];
 
@@ -77,9 +77,9 @@ export default function Login() {
           </div>
 
           {/* Logo */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg p-2">
-              <img src="/Half-Logo.png" alt="SweatTrack Logo" className="w-full h-full object-contain" />
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
+              <img src="/Half-Logo.png" alt="SweatTrack Logo" className="w-[95%] h-[95%] object-contain" />
             </div>
             <div>
               <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.25em]">Sweat</p>
@@ -87,12 +87,12 @@ export default function Login() {
             </div>
           </div>
 
-          <p className="text-white/75 text-sm leading-relaxed max-w-[280px] mb-8">
+          <p className="text-white/75 text-sm leading-relaxed max-w-[280px] mt-8 mb-6">
             Plataforma clínica de monitoramento de hidratação e performance esportiva de alta precisão.
           </p>
 
           {/* Feature list */}
-          <div className="hidden md:flex flex-col gap-3 mb-auto">
+          <div className="hidden md:flex flex-col gap-6 mb-auto">
             {FEATURES.map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-3">
                 <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">

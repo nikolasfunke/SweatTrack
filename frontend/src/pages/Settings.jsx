@@ -121,7 +121,6 @@ export default function Settings() {
             <p className="section-title mb-1">Segurança</p>
             <SettingRow icon={<Lock size={15} />} label="Alterar senha" desc="Atualize suas credenciais"
               onClick={() => setShowPwModal(true)} />
-            <SettingRow icon={<Shield size={15} />} label="Privacidade de dados" desc="Controle seus dados" onClick={() => toast('Em breve', 'info')} />
           </Card>
 
           {/* About */}

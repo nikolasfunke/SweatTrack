@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Info, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -26,14 +26,9 @@ export default function Header({ title, showBack = false, actions }) {
             </button>
           ) : (
             <>
-              {/* Logo — only on mobile (sidebar shows it on desktop) */}
               <div className="md:hidden">
                 <Logo size="xl" />
               </div>
-              {/* Info icon — desktop only, matches Figma header */}
-              <button className="hidden md:flex w-8 h-8 rounded-full bg-sky-500/15 items-center justify-center text-sky-400 hover:bg-sky-500/25 transition-colors flex-shrink-0">
-                <Info size={15} />
-              </button>
             </>
           )}
           {title && (
@@ -43,12 +38,10 @@ export default function Header({ title, showBack = false, actions }) {
           )}
         </div>
 
-        {/* Center — brand logo on desktop */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
           <img src="/Full-Logo.svg" alt="SweatTrack" className="h-9 w-auto object-contain" />
         </div>
 
-        {/* Right */}
         <div className="flex items-center gap-2">
           {actions}
           <button
